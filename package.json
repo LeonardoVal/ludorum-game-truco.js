@@ -1,0 +1,41 @@
+{
+	"name": "@creatartis/ludorum-game-truco",
+	"description": "Implementation for Ludorum of the latin american card game Truco.",
+	"keywords": [
+		"artificial-intelligence",
+		"artificial-players",
+		"card-game",
+		"ludorum",
+		"truco",
+		"javascript"
+	],
+	"version": "0.0.1",
+	"author": {
+		"name": "Leonardo Val",
+		"email": "leonardo.val@creatartis.com"
+	},
+	"homepage": "http://creatartis.com",
+	"contributors": [],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "http://github.com/LeonardoVal/ludorum-game-truco.js"
+	},
+	"main": "build/ludorum-game-truco.min.js",
+	"files": [
+		"build",
+		"LICENSE.md"
+	],
+	"dependencies": {
+		"creatartis-base": "~0.1.7",
+		"ludorum": "~0.2.1-beta",
+		"sermat": "~0.0.9"
+	},
+	"devDependencies": {
+		"creatartis-grunt": "~0.0.14"
+	},
+	"scripts": {
+		"test": "grunt",
+		"start": "xdg-open tests/playtester.html"
+	}
+}
