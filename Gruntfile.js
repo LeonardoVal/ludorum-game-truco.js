@@ -6,7 +6,11 @@ module.exports = function (grunt) {
 	});
 
 	require('creatartis-grunt').config(grunt, {
-		sourceNames: ['__prologue__', '__epilogue__'],
+		sourceNames: ['__prologue__',
+				'common',
+				'Truco',
+				'ai/SubTruco',
+			'__epilogue__'],
 		deps: [
 			{ id: 'creatartis-base', name: 'base' },
 			{ id: 'sermat', name: 'Sermat',
@@ -16,14 +20,8 @@ module.exports = function (grunt) {
 		 		path: 'node_modules/ludorum/build/playtester-common.js' }
 		],
 		targets: {
-			build_umd: {
-				fileName: 'build/ludorum-game-truco',
-				wrapper: 'umd'
-			},
-			build_raw: {
-				fileName: 'build/ludorum-game-truco-tag',
-				wrapper: 'tag'
-			}
+			build_umd: { wrapper: 'umd', fileName: 'build/ludorum-game-truco' },
+			build_raw: { wrapper: 'tag', fileName: 'build/ludorum-game-truco-tag' }
 		},
 		connect: {
 			playtester: 'tests/playtester.html'

@@ -16,5 +16,10 @@ function __init__(base, Sermat, ludorum) { "use strict";
 		__name__: 'ludorum_game_truco',
 		__init__: __init__,
 		__dependencies__: [base, Sermat, ludorum],
-		__SERMAT__: { include: [base, ludorum] }
+		__SERMAT__: { include: [base, ludorum] },
+
+		/** The `ai` is the namespace used for functions and definitions relating to artificial
+		intelligence.
+		*/
+		ai: { }
 	};
