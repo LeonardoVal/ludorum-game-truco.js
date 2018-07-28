@@ -9,15 +9,15 @@ TODO
  *
  * Note that cards are sorted in ascending order so index is consistent
  */
-function playCard(moves,index)
 
 /**
  * Funcion que recibe por parametro la mano actual de un jugador, y retorna los posibles movimientos.
  */
 
 function generateMoves(cards) {
-    let moves = []
+    let moves = [];
     for (let i = 0; i < cards.length; i++) {
-        moves[i] = i;
+        moves.push(i);
     }
+    return moves;
 }
