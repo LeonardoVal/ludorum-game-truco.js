@@ -16,14 +16,8 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 
 		this.winner = null;
 
-		//Posicion 0: puntaje de Mano, posicion 1: puntaje del Pie
-		this.score = [0, 0];
-
+		// 1 for the Hand, -1 for Foot
 		this.result_parcial = [];
-		//Si gana el mano, se pone 1, si gana el pie -1
-
-		//resultado_parcial[3]=={"M","P","E"};
-
 	},
 
 	/** The players' roles in a Truco match are `"Hand"` (_Mano_) and `"Foot"` (_Pie_).
@@ -63,9 +57,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		}
 	},
 
-	/**
-	 *
-	 * e.g. { "Hand": {player: "Hand", }}
+	/** TODO
 	*/
 	next: function next(moves, haps, update) {
 		let move = moves[this.activePlayer()];
