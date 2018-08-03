@@ -19,6 +19,9 @@ module.exports = function (grunt) {
 			{ id: 'playtester', dev: true, module: false,
 		 		path: 'node_modules/ludorum/build/playtester-common.js' }
 		],
+		jshint: {
+			esversion: 6
+		},
 		targets: {
 			build_umd: { wrapper: 'umd', fileName: 'build/ludorum-game-truco' },
 			build_raw: { wrapper: 'tag', fileName: 'build/ludorum-game-truco-tag' }

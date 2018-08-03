@@ -7,7 +7,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 
 	/** TODO
 	*/
-	constructor: function SubTruco(activePlayer, cardsHand, cardsFoot){
+	constructor: function SubTruco(activePlayer, cardsHand, cardsFoot) {
 		Game.call(this, activePlayer);
 
 		this.table = [];
@@ -68,8 +68,8 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	 * e.g. { "Hand": {player: "Hand", }}
 	*/
 	next: function next(moves, haps, update) {
-		let move = moves[this.activePlayer()];
-		let cartaATirar;
+		var move = moves[this.activePlayer()];
+		var cartaATirar;
 
 		if (this.activePlayer() === "Hand") {
 			cartaATirar = this.cardsHand[move];
@@ -118,8 +118,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 					return "Foot";
 				}
 			} else {
-				if (result_parcial == [1, -1, 1] || result_parcial == [1, -1, 0] || result_parcial == [0, 0, 0]
-						|| result_parcial == [0, 0, 1]) {
+				if (result_parcial == [1, -1, 1] || result_parcial == [1, -1, 0] || result_parcial == [0, 0, 0] || result_parcial == [0, 0, 1]) {
 					return "Hand";
 				} else if (result_parcial == [-1, 1, -1] || result_parcial == [-1, 1, 0] || result_parcial == [0, 0, -1]) {
 					return "Foot";
