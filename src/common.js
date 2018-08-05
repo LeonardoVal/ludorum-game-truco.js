@@ -15,8 +15,9 @@ TODO
  */
 
 function generateMoves(cards) {
-    var moves = [];
-    for (var i = 0; i < cards.length; i++) {
-        moves[i] = i;
+    let moves = [];
+    for (let i = 0; i < cards.length; i++) {
+        moves.push(i);
     }
+    return moves;
 }
