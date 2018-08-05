@@ -2,6 +2,9 @@
 
 Simplified version of the _truco_ subgame of the Truco card game, made to investigate the game.
 */
+
+// TODO: Calcular tiempo que toma MiniMaxPlayer NO ALPHA BETA
+
 var SubTruco = exports.ai.SubTruco = declare(Game, {
 	name: 'Truco',
 
@@ -68,6 +71,8 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	 * e.g. { "Hand": {player: "Hand", }}
 	*/
 	next: function next(moves, haps, update) {
+		// TODO: Se debe devolver una instancia nueva sii !update (update es falso)
+		// var that =
 		var move = moves[this.activePlayer()];
 		var cartaATirar;
 
@@ -97,6 +102,8 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 
 			this.winner = this.partialWinner();
 		}
+
+		activePlayer = activePlayer === 'Hand' ? 'Foot' : 'Hand';
 
 
 		return null;
