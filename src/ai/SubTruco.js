@@ -61,7 +61,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	},
 
 	clone: function clone() {
-		var that = new SubTruco(this.activePlayer, this.cardsHand.slice(0), this.cardsFoot.slice(0));
+		var that = new SubTruco(this.activePlayer(), this.cardsHand.slice(0), this.cardsFoot.slice(0));
 		that.table = this.table.slice(0);
 		that.winner = this.winner;
 		that.result_parcial = this.result_parcial.slice(0);

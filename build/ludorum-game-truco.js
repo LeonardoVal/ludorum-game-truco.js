@@ -179,16 +179,16 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	},
 
 	clone: function clone() {
-		var that = new SubTruco(this.activePlayer, this.cardsHand.slice(), this.cardsFoot.slice());
-		that.table = this.table.slice();
+		var that = new SubTruco(this.activePlayer(), this.cardsHand.slice(0), this.cardsFoot.slice(0));
+		that.table = this.table.slice(0);
 		that.winner = this.winner;
-		that.result_parcial = this.result_parcial.slice();
+		that.result_parcial = this.result_parcial.slice(0);
+		return that;
 	},
 
 	/** TODO
 	*/
 	next: function next(moves, haps, update) {
-		// TODO: Se debe devolver una instancia nueva sii !update (update es falso)
 		var that = update ? this : this.clone();
 		var move = moves[this.activePlayer()];
 		var cartaATirar;
