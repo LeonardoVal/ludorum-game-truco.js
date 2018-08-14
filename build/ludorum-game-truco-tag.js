@@ -46,8 +46,9 @@ TODO
 function generateMoves(cards) {
     var moves = [];
     for (var i = 0; i < cards.length; i++) {
-        moves[i] = i;
+        moves.push(i);
     }
+    return moves;
 }
 
 
@@ -113,6 +114,9 @@ Sermat.include(exports);
 
 Simplified version of the _truco_ subgame of the Truco card game, made to investigate the game.
 */
+
+// TODO: Calcular tiempo que toma MiniMaxPlayer NO ALPHA BETA
+
 var SubTruco = exports.ai.SubTruco = declare(Game, {
 	name: 'Truco',
 
@@ -127,14 +131,8 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 
 		this.winner = null;
 
-		//Posicion 0: puntaje de Mano, posicion 1: puntaje del Pie
-		this.score = [0, 0];
-
+		// 1 for the Hand, -1 for Foot
 		this.result_parcial = [];
-		//Si gana el mano, se pone 1, si gana el pie -1
-
-		//resultado_parcial[3]=={"M","P","E"};
-
 	},
 
 	/** The players' roles in a Truco match are `"Hand"` (_Mano_) and `"Foot"` (_Pie_).
@@ -174,11 +172,18 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		}
 	},
 
-	/**
-	 *
-	 * e.g. { "Hand": {player: "Hand", }}
+	clone: function clone() {
+		var that = new SubTruco(this.activePlayer, this.cardsHand.slice(), this.cardsFoot.slice());
+		that.table = this.table.slice();
+		that.winner = this.winner;
+		that.result_parcial = this.result_parcial.slice();
+	},
+
+	/** TODO
 	*/
 	next: function next(moves, haps, update) {
+		// TODO: Se debe devolver una instancia nueva sii !update (update es falso)
+		var that = update ? this : this.clone();
 		var move = moves[this.activePlayer()];
 		var cartaATirar;
 
@@ -208,6 +213,8 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 
 			this.winner = this.partialWinner();
 		}
+
+		activePlayer = activePlayer === 'Hand' ? 'Foot' : 'Hand';
 
 
 		return null;
