@@ -173,10 +173,10 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	},
 
 	clone: function clone() {
-		var that = new SubTruco(this.activePlayer(), this.cardsHand.slice(0), this.cardsFoot.slice(0));
-		that.table = this.table.slice(0);
+		var that = new SubTruco(this.activePlayer(), this.cardsHand.slice(), this.cardsFoot.slice());
+		that.table = this.table.slice();
 		that.winner = this.winner;
-		that.result_parcial = this.result_parcial.slice(0);
+		that.result_parcial = this.result_parcial.slice();
 		return that;
 	},
 
@@ -187,37 +187,38 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		var move = moves[this.activePlayer()];
 		var cartaATirar;
 
-		if (this.activePlayer() === "Hand") {
-			cartaATirar = this.cardsHand[move];
-			this.cardsHand.splice(move, 1);
-			this.mesa.push(cartaATirar);
+		if (that.activePlayer() === "Hand") {
+			cartaATirar = that.cardsHand[move];
+			that.cardsHand.splice(move, 1);
+			that.table.push(cartaATirar);
 			// Quitar de la mano del jugador una carta y ponerla en la mesa
 
 		} else {
-			cartaATirar = this.cardsFoot[move];
-			this.cardsFoot.splice(move, 1);
-			this.mesa.push(cartaATirar);
+			cartaATirar = that.cardsFoot[move];
+			that.cardsFoot.splice(move, 1);
+			that.table.push(cartaATirar);
 
 			//Comparar cartas en la mesa con la del mano, y ver quien gano la jugada parcial
-			switch (cardsFoot.length) {
+			switch (that.cardsFoot.length) {
 				case 2:
-					result_parcial[0] = this.mesa[0] > this.mesa[1] ? 1 : -1;
+					that.result_parcial[0] = that.table[0] > that.table[1] ? 1 : -1;
 					break;
 				case 1:
-					result_parcial[1] = this.mesa[2] > this.mesa[3] ? 1 : -1;
+					that.result_parcial[1] = that.table[2] > that.table[3] ? 1 : -1;
 					break;
 				case 0:
-					result_parcial[2] = this.mesa[4] > this.mesa[5] ? 1 : -1;
+					that.result_parcial[2] = that.table[4] > that.table[5] ? 1 : -1;
 					break;
 			}
 
-			this.winner = this.partialWinner();
+			that.winner = that.partialWinner();
 		}
 
-		activePlayer = activePlayer === 'Hand' ? 'Foot' : 'Hand';
+		var opponent = that.activePlayer() === 'Hand' ? 'Foot' : 'Hand';
+		that.activatePlayers(opponent);
 
 
-		return null;
+		return that;
 	},
 
 	partialWinner: function partialWinner() {
@@ -227,6 +228,8 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		// PARDA 3ra: gana primera
 		// PARDA 1ra y 2da: gana tercera
 		// PARDA 1ra 2da y 3ra: gana la mano
+
+		var result_parcial = this.result_parcial;
 
 		if (result_parcial.length > 1) {
 			if (result_parcial.length == 2) {
