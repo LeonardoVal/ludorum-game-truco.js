@@ -27,6 +27,14 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			//expect(game2.moves().Foot).toEqual([0]);
 		});
 
+		it("has a winner", function() {
+			var gameT = new ludorum_game_truco.ai.SubTruco("Hand", [2, 4, 6], [1, 3, 5]);
+
+			expect(gameT.result()).toBeFalsy();
+
+			// TODO: Test games with 'pardas', all possible combinations
+		});
+
 	});
 
 }); //// define.
