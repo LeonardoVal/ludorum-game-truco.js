@@ -1,0 +1,30 @@
+var p = new MiniMAxPlayer({horizon: Inifinity});
+
+var oldMiniMAx = p.constructor.prototype.minimax;
+// p.constructor.prototype.minimax = function minimax_hook(game, player, depth) {
+p.minimax = function minimax_hook(game, player, depth) {
+    var r = oldMiniMAx.call(this, game, player, depth);
+    // guardar {game: r}
+    return r;
+}
+
+
+
+
+
+
+ 1) Escribir tests de winner (pardas)
+    - Casos borde (que gane mano y que gane pie)
+    - Juego estándar
+    - Función que, dadas las cartas en orden a ser jugadas, espere un ganador
+        - Checkear que el juego temrine súbitamente (2 ganadas gana partida)
+ 2) Medir el tiempo de juego
+    - timestamps (ver `Date`) en ajvascript.
+    - ver resta de tiempos. (hacer promedio)
+
+ 3) Como almacenar todos los datos
+    - cada partida, cada carta jugada cual es el mejor movimiento siguiente
+
+ 4) Embido
+
+ 4) Emepzar TRUCO master magico
