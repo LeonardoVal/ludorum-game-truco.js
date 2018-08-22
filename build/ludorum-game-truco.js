@@ -254,18 +254,14 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		if (par.length > 1) {
 			if (par.length == 2) {
 				if (arrEq(par, [1, 1]) || arrEq(par, [0, 1]) || arrEq(par, [1, 0])) {
-					console.log("Into A");
 					return "Hand";
 				} else if (arrEq(par, [-1, -1]) || arrEq(par, [0, -1]) || arrEq(par, [-1, 0])) {
-					console.log("Into B");
 					return "Foot";
 				}
 			} else {
 				if (arrEq(par, [1, -1, 1]) || arrEq(par, [1, -1, 0]) || arrEq(par, [0, 0, 0]) || arrEq(par, [0, 0, 1]) || arrEq(par, [-1, 1, 1])) {
-					console.log("Into C");
 					return "Hand";
 				} else if (arrEq(par, [-1, 1, -1]) || arrEq(par, [-1, 1, 0]) || arrEq(par, [0, 0, -1])) {
-					console.log("Into D");
 					return "Foot";
 				}
 			}
