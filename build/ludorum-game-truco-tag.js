@@ -51,6 +51,19 @@ function generateMoves(cards) {
     return moves;
 }
 
+function arrEq(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length != b.length) return false;
+
+    // If you don't care about the order of the elements inside
+    // the array, you should sort both arrays here.
+
+    for (var i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
 
 /** # Truco base
 
@@ -229,19 +242,24 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		// PARDA 1ra y 2da: gana tercera
 		// PARDA 1ra 2da y 3ra: gana la mano
 
-		var result_parcial = this.result_parcial;
+		var par = this.result_parcial;
 
-		if (result_parcial.length > 1) {
-			if (result_parcial.length == 2) {
-				if (result_parcial == [1, 1] || result_parcial == [0, 1] || result_parcial == [1, 0]) {
+
+		if (par.length > 1) {
+			if (par.length == 2) {
+				if (arrEq(par, [1, 1]) || arrEq(par, [0, 1]) || arrEq(par, [1, 0])) {
+					console.log("Into A");
 					return "Hand";
-				} else if (result_parcial == [-1, -1] || result_parcial == [0, -1] || result_parcial == [-1, 0]) {
+				} else if (arrEq(par, [-1, -1]) || arrEq(par, [0, -1]) || arrEq(par, [-1, 0])) {
+					console.log("Into B");
 					return "Foot";
 				}
 			} else {
-				if (result_parcial == [1, -1, 1] || result_parcial == [1, -1, 0] || result_parcial == [0, 0, 0] || result_parcial == [0, 0, 1]) {
+				if (arrEq(par, [1, -1, 1]) || arrEq(par, [1, -1, 0]) || arrEq(par, [0, 0, 0]) || arrEq(par, [0, 0, 1]) || arrEq(par, [-1, 1, 1])) {
+					console.log("Into C");
 					return "Hand";
-				} else if (result_parcial == [-1, 1, -1] || result_parcial == [-1, 1, 0] || result_parcial == [0, 0, -1]) {
+				} else if (arrEq(par, [-1, 1, -1]) || arrEq(par, [-1, 1, 0]) || arrEq(par, [0, 0, -1])) {
+					console.log("Into D");
 					return "Foot";
 				}
 			}
