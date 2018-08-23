@@ -203,6 +203,10 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	*/
 	next: function next(moves, haps, update) {
 		var that = update ? this : this.clone();
+		if (that.winner) {
+			return that;
+		}
+
 		var move = moves[this.activePlayer()];
 		var cartaATirar;
 
@@ -220,13 +224,13 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 			//Comparar cartas en la mesa con la del mano, y ver quien gano la jugada parcial
 			switch (that.cardsFoot.length) {
 				case 2:
-					that.result_parcial[0] = that.table[0] > that.table[1] ? 1 : -1;
+					that.result_parcial[0] = that.table[0] > that.table[1] ? 1 : (that.table[0] == that.table[1] ? 0 : -1);
 					break;
 				case 1:
-					that.result_parcial[1] = that.table[2] > that.table[3] ? 1 : -1;
+					that.result_parcial[1] = that.table[2] > that.table[3] ? 1 : (that.table[2] == that.table[3] ? 0 : -1);
 					break;
 				case 0:
-					that.result_parcial[2] = that.table[4] > that.table[5] ? 1 : -1;
+					that.result_parcial[2] = that.table[4] > that.table[5] ? 1 : (that.table[4] == that.table[5] ? 0 : -1);
 					break;
 			}
 

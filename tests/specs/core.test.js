@@ -17,11 +17,16 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			winnerIsGame = winnerIsGame.next({'Hand': 0});
 			winnerIsGame = winnerIsGame.next({'Foot': 0});
 
-			winnerIsGame = winnerIsGame.next({'Hand': 0});
-			winnerIsGame = winnerIsGame.next({'Foot': 0});
+			if (!winnerIsGame.result()) {
+				winnerIsGame = winnerIsGame.next({'Hand': 0});
+				winnerIsGame = winnerIsGame.next({'Foot': 0});
+			}
 
-			winnerIsGame = winnerIsGame.next({'Hand': 0});
-			winnerIsGame = winnerIsGame.next({'Foot': 0});
+
+			if (!winnerIsGame.result()) {
+				winnerIsGame = winnerIsGame.next({'Hand': 0});
+				winnerIsGame = winnerIsGame.next({'Foot': 0});
+			}
 
 			if (winner === 'Hand') {
 				expect(winnerIsGame.result()).toEqual({'Foot': -1, 'Hand': 1});
@@ -52,7 +57,41 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(gameT.result()).toBeFalsy();
 
 			// TODO: Test games with 'pardas', all possible combinations
+
+			// SIN EMPATE: gana el que haya ganado 2 manos
+			theWinnerIs([12, 5, 8], [6, 7, 5], 'Hand');
 			theWinnerIs([2, 3, 6], [14, 1, 7], 'Foot');
+
+			// PARDA 1ra: gana segunda
+			theWinnerIs([12, 5, null], [12, 7, null], 'Foot');
+			theWinnerIs([2, 3, null], [2, 1, null], 'Hand');
+
+
+			// PARDA 2da: gana primera
+			theWinnerIs([5, 12, null], [7, 12, null], 'Foot');
+			theWinnerIs([3, 2, null], [1, 2, null], 'Hand');
+
+
+			// PARDA 3ra: gana primera
+			theWinnerIs([5, 8, 12], [7, 5, 12], 'Foot');
+			theWinnerIs([5, 3, 12], [7, 5, 12], 'Foot');
+
+			theWinnerIs([3, 12, 2], [1, 10, 2], 'Hand');
+			theWinnerIs([3, 5, 2], [1, 10, 2], 'Hand');
+
+			// PARDA 1ra y 2da: gana tercera
+			theWinnerIs([7, 5, 10], [7, 5, 12], 'Foot');
+			theWinnerIs([1, 10, 3], [1, 10, 2], 'Hand');
+
+
+			// PARDA 1ra 2da y 3ra: gana la mano
+			for (var i = 1; i <= 14; i++) {
+				for (var j = 1; j <= 14; j++) {
+					for (var k = 1; k <= 14; k++) {
+						theWinnerIs([i, j, k], [i, j, k], 'Hand');
+					}
+				}
+			}
 		});
 
 		it("can be played", function() {
