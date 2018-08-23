@@ -149,6 +149,17 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(game.result()).toEqual({'Foot': -1, 'Hand': 1});
 		});
 
+		it("can be solved by MiniMax", function () {
+			console.log("Testing time!");
+			var game = new ludorum_game_truco.ai.SubTruco('Hand', [12, 5, 8], [6, 7, 5]);
+			var p = new ludorum.players.MiniMaxPlayer({horizon: Infinity});
+			var t0 = performance.now();
+			p.minimax(game, 'Hand', 0);
+			var t1 = performance.now();
+
+			console.log("It took: " + (t1 - t0) + " milliseconds");
+		});
+
 	});
 
 }); //// define.
