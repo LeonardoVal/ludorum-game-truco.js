@@ -147,6 +147,57 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(game.table).toEqual([2, 5, 4, 3, 6, 1]);
 			expect(game.activePlayer()).toBe('Hand');
 			expect(game.result()).toEqual({'Foot': -1, 'Hand': 1});
+
+
+
+			var game2 = new ludorum_game_truco.ai.SubTruco('Hand', [6, 7, 5], [12, 5, 8]);
+
+			expect(game2.table).toEqual([]);
+
+			game2 = game2.next({'Hand': 0});
+
+			expect(game2.cardsHand).toEqual([7, 5]);
+			expect(game2.cardsFoot).toEqual([12, 5, 8]);
+			expect(game2.table).toEqual([6]);
+			expect(game2.activePlayer()).toBe('Foot');
+			expect(game2.result()).toBeFalsy();
+
+			game2 = game2.next({'Foot': 1});
+			expect(game2.cardsHand).toEqual([7, 5]);
+			expect(game2.cardsFoot).toEqual([12, 8]);
+			expect(game2.table).toEqual([6, 5]);
+			expect(game2.activePlayer()).toBe('Hand');
+			expect(game2.result()).toBeFalsy();
+
+			game2 = game2.next({'Hand': 0});
+			expect(game2.cardsHand).toEqual([5]);
+			expect(game2.cardsFoot).toEqual([12, 8]);
+			expect(game2.table).toEqual([6, 5, 7]);
+			expect(game2.activePlayer()).toBe('Foot');
+			expect(game2.result()).toBeFalsy();
+
+			game2 = game2.next({'Foot': 0});
+			expect(game2.cardsHand).toEqual([5]);
+			expect(game2.cardsFoot).toEqual([8]);
+			expect(game2.table).toEqual([6, 5, 7, 12]);
+			expect(game2.activePlayer()).toBe('Hand');
+			expect(game2.result()).toBeFalsy();
+
+
+			game2 = game2.next({'Hand': 0});
+			expect(game2.cardsHand).toEqual([]);
+			expect(game2.cardsFoot).toEqual([8]);
+			expect(game2.table).toEqual([6, 5, 7, 12, 5]);
+			expect(game2.activePlayer()).toBe('Foot');
+			expect(game2.result()).toBeFalsy();
+
+			game2 = game2.next({'Foot': 0});
+			expect(game2.cardsHand).toEqual([]);
+			expect(game2.cardsFoot).toEqual([]);
+			expect(game2.table).toEqual([6, 5, 7, 12, 5, 8]);
+			expect(game2.activePlayer()).toBe('Hand');
+			console.log(game2.result_parcial);
+			expect(game2.result()).toEqual({'Foot': 1, 'Hand': -1});
 		});
 
 		it("can be solved by MiniMax", function () {

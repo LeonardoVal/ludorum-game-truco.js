@@ -265,7 +265,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 			} else {
 				if (arrEq(par, [1, -1, 1]) || arrEq(par, [1, -1, 0]) || arrEq(par, [0, 0, 0]) || arrEq(par, [0, 0, 1]) || arrEq(par, [-1, 1, 1])) {
 					return "Hand";
-				} else if (arrEq(par, [-1, 1, -1]) || arrEq(par, [-1, 1, 0]) || arrEq(par, [0, 0, -1])) {
+				} else if (arrEq(par, [-1, 1, -1]) || arrEq(par, [-1, 1, 0]) || arrEq(par, [0, 0, -1]) || arrEq(par, [1, -1, -1])) {
 					return "Foot";
 				}
 			}
