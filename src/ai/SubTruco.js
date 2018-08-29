@@ -152,7 +152,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	'static __SERMAT__': {
 		identifier: exports.__package__ +'.SubTruco',
 		serializer: function serialize_Mancala(obj) {
-			return [obj.activePlayer()];
+			return [obj.activePlayer(), obj.cardsHand, obj.cardsFoot, obj.table];
 		}
 	}
 }); // declare Truco.
