@@ -24,10 +24,10 @@ module.exports = function (grunt) {
 			build_raw: { wrapper: 'tag', fileName: 'build/ludorum-game-truco-tag' }
 		},
 		connect: {
-			playtester: 'tests/playtester.html'
+			console: 'tests/console.html'
 		}
 	});
 
 	grunt.registerTask('default', ['build']);
-	grunt.registerTask('playtest', ['compile', 'connect:playtester']);
+	grunt.registerTask('console', ['compile', 'connect:console']);
 };
