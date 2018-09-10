@@ -29,7 +29,7 @@ function __init__(base, Sermat, ludorum) { "use strict";
 
 /** # Common functions and utilities.
 
-TODO
+Assorted utility functions and definitions used all over this library.
 */
 
 /**
@@ -43,13 +43,13 @@ TODO
  * Funcion que recibe por parametro la mano actual de un jugador, y retorna los posibles movimientos.
  */
 
-function generateMoves(cards) {
+exports.generateMoves = function generateMoves(cards) {
     var moves = [];
     for (var i = 0; i < cards.length; i++) {
         moves.push(i);
     }
     return moves;
-}
+};
 
 function arrEq(a, b) {
     if (a === b) return true;
@@ -170,24 +170,19 @@ Sermat.include(exports);
 Simplified version of the _truco_ subgame of the Truco card game, made to investigate the game.
 */
 
-// TODO: Calcular tiempo que toma MiniMaxPlayer NO ALPHA BETA
-
 var SubTruco = exports.ai.SubTruco = declare(Game, {
-	name: 'Truco',
+	name: 'SubTruco',
 
-	/** TODO
+	/** The constructor takes:
+	+ `table`: An array with the cards on the table,
+	+ `cardsHand`: An array with the cards on the first player's hand,
+	+ `cardsFoot`: An array with the cards on the second player's hand.
 	*/
-	constructor: function SubTruco(activePlayer, cardsHand, cardsFoot) {
-		Game.call(this, activePlayer);
-
-		this.table = [];
+	constructor: function SubTruco(table, cardsHand, cardsFoot) {
+		Game.call(this, this.players[table.length % 2]);
+		this.table = table;
 		this.cardsHand = cardsHand;
 		this.cardsFoot = cardsFoot;
-
-		this.winner = null;
-
-		// 1 for the Hand, -1 for Foot
-		this.result_parcial = [];
 	},
 
 	/** The players' roles in a Truco match are `"Hand"` (_Mano_) and `"Foot"` (_Pie_).
@@ -196,135 +191,145 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 
 	// ## Game logic ###############################################################################
 
-	/** TODO
-	 * Devuelve un objeto de los movimientos posibles para los jugadores activo
-	 *
-	 * En este caso da las cartas que pueden ser tiradas.
-	 *
-	 * e.g. { "Hand": [{player: "Hand", card: 0}, {player: "Hand", card: 1}]}
+	/** A move for `SubTruco` is simply the index for the card to be played in the active player's
+	hand.
 	*/
-	moves: function moves() { // { player: [move]}
-		if (!this.result()) {
-			var moves = {};
-			if (this.activePlayer() === "Hand") {
-				moves[this.activePlayer()] = generateMoves(this.cardsHand);
-			} else {
-				moves[this.activePlayer()] = generateMoves(this.cardsFoot);
-			}
-			return moves;
-		} else {
-			return null;
+	moves: function moves() {
+		var moves = this.result() ? null : {};
+		if (moves) {
+			var cards = this.activePlayer() === 'Hand' ? this.cardsHand : this.cardsFoot;
+			moves[this.activePlayer()] = cards.map((_, i) => i);
 		}
+		return moves;
 	},
 
-	/** TODO
+	/** The table results are the matches between the cards of each player in the table. 
+	*/
+	__tableResults__: function __tableResults__() {
+		var r = [];
+		for (var i = 0; i < this.table.length; i += 2) {
+			r.push(Math.sign(this.table[i] - this.table[i+1]));
+		}
+		return r;
+	},
+
+	/** The round may end when both players have played two cards, if one player wins both card 
+	matches or wins one with the other being tied. The round must end when both players have played
+	all their three cards. If the last card match is tied, the player that won the first card match
+	wins. If all three card matches are tied, the _Hand_ player wins. 
 	*/
 	result: function result() {
-		if (this.winner) {
-			return this.victory(this.winner);
-		} else {
-			return null;
+		var tableResults = this.__tableResults__(),
+			tableResultSum;
+		if (tableResults.length == 2) {
+			tableResultSum = tableResults[0] + tableResults[1];
+			if (tableResultSum > 0) {
+				return this.victory('Hand');
+			} else if (tableResultSum < 0) {
+				return this.victory('Foot');
+			}
+		} else if (tableResults.length === 3) {
+			tableResultSum = tableResults[0] + tableResults[1] + tableResults[2];
+			if (tableResultSum > 0 || tableResultSum === 0 && tableResults[0] >= 0) {
+				return this.victory('Hand');
+			} else if (tableResultSum < 0 || tableResultSum === 0 && tableResults[0] < 0) {
+				return this.victory('Foot');
+			}
 		}
-	},
-
-	clone: function clone() {
-		var that = new SubTruco(this.activePlayer(), this.cardsHand.slice(), this.cardsFoot.slice());
-		that.table = this.table.slice();
-		that.winner = this.winner;
-		that.result_parcial = this.result_parcial.slice();
-		return that;
+		return null;
 	},
 
 	/** TODO
 	*/
 	next: function next(moves, haps, update) {
-		var that = update ? this : this.clone();
-		if (that.winner) {
-			return that;
-		}
-
-		var move = moves[this.activePlayer()];
-		var cartaATirar;
-
-		if (that.activePlayer() === "Hand") {
-			cartaATirar = that.cardsHand[move];
-			that.cardsHand.splice(move, 1);
-			that.table.push(cartaATirar);
-			// Quitar de la mano del jugador una carta y ponerla en la mesa
-
-		} else {
-			cartaATirar = that.cardsFoot[move];
-			that.cardsFoot.splice(move, 1);
-			that.table.push(cartaATirar);
-
-			//Comparar cartas en la mesa con la del mano, y ver quien gano la jugada parcial
-			switch (that.cardsFoot.length) {
-				case 2:
-					that.result_parcial[0] = that.table[0] > that.table[1] ? 1 : (that.table[0] == that.table[1] ? 0 : -1);
-					break;
-				case 1:
-					that.result_parcial[1] = that.table[2] > that.table[3] ? 1 : (that.table[2] == that.table[3] ? 0 : -1);
-					break;
-				case 0:
-					that.result_parcial[2] = that.table[4] > that.table[5] ? 1 : (that.table[4] == that.table[5] ? 0 : -1);
-					break;
-			}
-
-			that.winner = that.partialWinner();
-		}
-
-		var opponent = that.activePlayer() === 'Hand' ? 'Foot' : 'Hand';
-		that.activatePlayers(opponent);
-
-
+		base.raiseIf(this.result(), "Game is finished!");
+		var that = update ? this : this.clone(),
+			activePlayer = this.activePlayer(),
+			move = +moves[activePlayer],
+			cards = that['cards'+ activePlayer];
+		base.raiseIf(move < 0 || move >= cards.length, 'Invalid move ', move, 'at', that, '!');
+		that.table.push(cards[move]);
+		cards.splice(move, 1);
+		that.activatePlayers(this.opponent());
 		return that;
 	},
 
-	partialWinner: function partialWinner() {
-		// SIN EMPATE: gana el que haya ganado 2 manos
-		// PARDA 1ra: gana segunda
-		// PARDA 2da: gana primera
-		// PARDA 3ra: gana primera
-		// PARDA 1ra y 2da: gana tercera
-		// PARDA 1ra 2da y 3ra: gana la mano
+	// ## Utility methods #########################################################################
 
-		var par = this.result_parcial;
-
-
-		if (par.length > 1) {
-			if (par.length == 2) {
-				if (arrEq(par, [1, 1]) || arrEq(par, [0, 1]) || arrEq(par, [1, 0])) {
-					return "Hand";
-				} else if (arrEq(par, [-1, -1]) || arrEq(par, [0, -1]) || arrEq(par, [-1, 0])) {
-					return "Foot";
-				}
-			} else {
-				if (arrEq(par, [1, -1, 1]) || arrEq(par, [1, -1, 0]) || arrEq(par, [0, 0, 0]) || arrEq(par, [0, 0, 1]) || arrEq(par, [-1, 1, 1])) {
-					return "Hand";
-				} else if (arrEq(par, [-1, 1, -1]) || arrEq(par, [-1, 1, 0]) || arrEq(par, [0, 0, -1]) || arrEq(par, [1, -1, -1])) {
-					return "Foot";
-				}
-			}
-		}
-
-		return null;
-
+	clone: function clone() {
+		return new this.constructor(this.table.slice(), this.cardsHand.slice(), 
+			this.cardsFoot.slice());
 	},
 
-	// ## Utility methods ##########################################################################
+	/** The string `identifier` for a `SubTruco` state always has 7 characters. The first one 
+	indicates the number of cards on the table. Then come the cards on the table, each encoded as
+	a character (base 36). After that come the cards of the _Hand_ player, and finally the ones of 
+	the _Foot_ player, both encoded in the same way as the cards on the table. 
+	*/
+	identifier: function identifier() {
+		var toChar = (n) => (n - 1).toString(36);
+		return this.table.length + this.table.map(toChar).join('') + 
+			this.cardsHand.map(toChar).join('') + 
+			this.cardsFoot.map(toChar).join('');
+	},
+
+	/** For this game suits are relevant only in the case of the sevens and the aces. Hence, cards
+	are encoded using numbers from 1 to 14. How each number may map to a given card is defined in
+	`CARDS`. Here the french deck's suits are used instead of the spanish deck's ones (because the
+	latter are not supported by Unicode). Spades and clubs are the same, diamonds are used for 
+	golds and hearts for cups.  
+	*/
+	'static CARDS': [
+		[],                    //  0: Invalid.
+		['4♦','4♥','4♠','4♣'], //  1: All fours.
+		['5♦','5♥','5♠','5♣'], //  2: All fives.
+		['6♦','6♥','6♠','6♣'], //  3: All sixes.
+		['7♥','7♣'],           //  4: Sevens of hearts (cups) and clubs.
+		['A♦','A♥','A♠','A♣'], //  5: All jacks (10s).
+		['B♦','B♥','B♠','B♣'], //  6: All knights (11s).
+		['C♦','C♥','C♠','C♣'], //  7: All kings (12s).
+		['1♦','1♥'],           //  8: Aces of diamonds (golds) and hearts (cups).
+		['2♦','2♥','2♠','2♣'], //  9: All twos.
+		['3♦','3♥','3♠','3♣'], // 10: All threes.
+		['7♦'],                // 11: Seven of diamonds (golds).
+		['7♠'],                // 12: Seven of spades.
+		['1♣'],                // 13: Ace of clubs.
+		['1♠']                 // 14: Ace of spades.
+	],
+
+	/** The `enumerateCards` function returns an iterable of all possible hands for `SubTruco`. The
+	order of the cards in each players' hand is not relevant. The amount of possible cards is 
+	checked by means of a regular expression.
+	*/
+	'static enumerateCards': function enumerateCards() {
+		var It = base.Iterable,
+			baseSequence = It.product.apply(It, It.repeat(It.range(1,14), 6).toArray());
+		return baseSequence.filter(function (cards) {
+			cards = cards.map((n) => n.toString(36));
+			var cardsHand = cards.slice(0, 3),
+				cardsFoot = cards.slice(3, 6),
+				sortedCards = cards.sort().join(''),
+				amountsRegExp = /([1235679a])\1{4,}|444+|888+|bb+|cc+|dd+|ee+/;
+			return cardsHand.join('') === cardsHand.sort().join('') &&
+				cardsFoot.join('') === cardsFoot.sort().join('') &&
+				!amountsRegExp.test(sortedCards);
+		}, function (cards) {
+			return [cards.slice(0,3), cards.slice(3,6)];
+		});
+	},
 
 	/** Serialization is used in the `toString()` method, but it is also vital for sending the game
 	state across a network or the marshalling between the rendering thread and a webworker.
 	*/
 	'static __SERMAT__': {
 		identifier: exports.__package__ +'.SubTruco',
-		serializer: function serialize_Mancala(obj) {
-			return [obj.activePlayer(), obj.cardsHand, obj.cardsFoot, obj.table];
+		serializer: function serialize_SubTruco(obj) {
+			return [obj.table, obj.cardsHand, obj.cardsFoot];
 		}
 	}
 }); // declare Truco.
 
-// ## Truco type initialization ####################################################################
+// ## SubTruco type initialization #################################################################
 
 /** Sermat serialization.
 */
