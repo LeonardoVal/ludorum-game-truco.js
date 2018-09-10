@@ -12,7 +12,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 	describe("ludorum-game-subtruco", function() {
 		function theWinnerIs(hand, foot, winner) {
-			var winnerIsGame = new ludorum_game_truco.ai.SubTruco("Hand", hand, foot);
+			var winnerIsGame = new ludorum_game_truco.ai.SubTruco([], hand, foot);
 
 			winnerIsGame = winnerIsGame.next({'Hand': 0});
 			winnerIsGame = winnerIsGame.next({'Foot': 0});
@@ -37,13 +37,13 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 		it("calculates possible moves", function () {
 			console.log("Started it calculates possible moves");
-			var game = new ludorum_game_truco.ai.SubTruco("Hand", [2, 4, 6], [1, 3, 5]);
+			var game = new ludorum_game_truco.ai.SubTruco([], [2, 4, 6], [1, 3, 5]);
 
 			expect(game.moves().Hand).toEqual([0, 1, 2]);
 			// Switch to foot
 			//expect(game.moves().Foot).toEqual([0, 1, 2]);
 
-			var game2 = new ludorum_game_truco.ai.SubTruco("Hand", [2], [1]);
+			var game2 = new ludorum_game_truco.ai.SubTruco([], [2], [1]);
 			expect(game2.moves().Hand).toEqual([0]);
 
 			// Switch to foot
@@ -52,7 +52,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 		it("has a winner", function() {
 			console.log("Started it has a winner");
-			var gameT = new ludorum_game_truco.ai.SubTruco("Hand", [2, 4, 6], [1, 3, 5]);
+			var gameT = new ludorum_game_truco.ai.SubTruco([], [2, 4, 6], [1, 3, 5]);
 
 			expect(gameT.result()).toBeFalsy();
 
@@ -66,11 +66,9 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			theWinnerIs([12, 5, null], [12, 7, null], 'Foot');
 			theWinnerIs([2, 3, null], [2, 1, null], 'Hand');
 
-
 			// PARDA 2da: gana primera
 			theWinnerIs([5, 12, null], [7, 12, null], 'Foot');
 			theWinnerIs([3, 2, null], [1, 2, null], 'Hand');
-
 
 			// PARDA 3ra: gana primera
 			theWinnerIs([5, 8, 12], [7, 5, 12], 'Foot');
@@ -96,7 +94,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 		it("can be played", function() {
 			console.log("Started it can be played");
-			var game = new ludorum_game_truco.ai.SubTruco("Hand", [2, 4, 6], [1, 3, 5]);
+			var game = new ludorum_game_truco.ai.SubTruco([], [2, 4, 6], [1, 3, 5]);
 
 			expect(game.table).toEqual([]);
 
@@ -150,7 +148,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 
 
-			var game2 = new ludorum_game_truco.ai.SubTruco('Hand', [6, 7, 5], [12, 5, 8]);
+			var game2 = new ludorum_game_truco.ai.SubTruco([], [6, 7, 5], [12, 5, 8]);
 
 			expect(game2.table).toEqual([]);
 
@@ -202,7 +200,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 		it("can be solved by MiniMax", function () {
 			console.log("Testing time!");
-			var game = new ludorum_game_truco.ai.SubTruco('Hand', [12, 5, 8], [6, 7, 5]);
+			var game = new ludorum_game_truco.ai.SubTruco([], [12, 5, 8], [6, 7, 5]);
 			var t0 = performance.now();
 			ludorum.players.MiniMaxPlayer.solution(game, {});
 			var t1 = performance.now();

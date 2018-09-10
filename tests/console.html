@@ -19,11 +19,11 @@ function main() { "use strict";
 	console.log("Initializing...");
 	require(['require-config'], function (init) {
 		init(['ludorum', 'creatartis-base', 'sermat', 'ludorum-game-truco'], function (ludorum, base, Sermat, truco) {
-			var g = new truco.ai.SubTruco('Hand', [7, 3, 9], [3, 7, 4])
-			var sol = ludorum.players.MiniMaxPlayer.solution(g, {horizon: Infinity, gameKey: function gameKey(g) {
-				return (g.activePlayer() === 'Hand' ? 0 : 1) + "/" + g.cardsHand + "/" + g.cardsFoot + "/" + g.table + "";
+			var g = new truco.ai.SubTruco([], [7, 3, 9], [3, 7, 4])
+			truco.ai.SubTruco.solution = ludorum.players.MiniMaxPlayer.solution(g, {horizon: Infinity, gameKey: function gameKey(g) {
+				return g.identifier();
 			}})
-			console.log(sol);
+			console.log(truco.ai.SubTruco.solution);
 		});
 	});
 	Array.prototype.slice.call(document.querySelectorAll('#reference tr td a')).forEach(function (jsLink) {
