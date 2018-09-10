@@ -32,7 +32,8 @@
 		"sermat": "~0.0.9"
 	},
 	"devDependencies": {
-		"creatartis-grunt": "~0.0.15"
+		"creatartis-grunt": "~0.0.15",
+		"better-sqlite3": "~4.1.4"
 	},
 	"scripts": {
 		"test": "grunt",
