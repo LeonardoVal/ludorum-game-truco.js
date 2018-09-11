@@ -21,16 +21,15 @@ function setupDatabase(path) {
 	return db;
 }
 
-function addCase(db, cardsHand, cardsFoot) {
+function addCase(cardsHand, cardsFoot, callback) {
 	var game = new ludorum_game_truco.ai.SubTruco([], cardsHand, cardsFoot),
 		solution = ludorum.players.MiniMaxPlayer.solution(game, { 
 			horizon: 10, 
 			gameKey: (g) => g.identifier()
 		}),
-		stmt = db.prepare('INSERT INTO Truco VALUES (?, ?, ?)'),
 		count = 0;
 	for (var id in solution) {
-		stmt.run(id, solution[id] > 0 ? 1 : 0, solution[id] < 0 ? 1 : 0);
+		callback(id, solution[id]);
 		count++;
 	}
 	return count;
@@ -38,6 +37,7 @@ function addCase(db, cardsHand, cardsFoot) {
 
 (function main() { /////////////////////////////////////////////////////////////////////////////////
 	var db = setupDatabase(),
+		insertStmt = db.prepare('INSERT INTO Truco VALUES (?, ?, ?)'),
 		caseCount = 0,
 		recordCount = 0,
 		LOGGER = base.Logger.ROOT;
@@ -45,12 +45,14 @@ function addCase(db, cardsHand, cardsFoot) {
 	LOGGER.appendToFile(base.Text.formatDate(new Date(), '"solution-truco-"yyyymmdd-hhnnss".log"'));
 	LOGGER.info("Starting Truco solution calculation.");
 
-	ludorum_game_truco.ai.SubTruco.enumerateCards().forEachApply(function (cardsHand, cardsFoot) {
+	ludorum_game_truco.ai.SubTruco.enumerateCards().take(1e2).forEachApply(function (cardsHand, cardsFoot) {
 		caseCount++;
-		recordCount += addCase(db, cardsHand, cardsFoot);
+		recordCount += addCase(cardsHand, cardsFoot, function (id, result) {
+			insertStmt.run(id, result > 0 ? 1 : 0, result < 0 ? 1 : 0);
+		});
 		if (caseCount % 50 === 0) {
 			LOGGER.info('Processed '+ caseCount +' cases ('+ recordCount +' records).');
-			db.exec('vacuum'); // Optimize the database. 
+			//db.exec('vacuum'); // Optimize the database. 
 		}
 	});
 	
