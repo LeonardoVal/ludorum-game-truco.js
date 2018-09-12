@@ -2,3 +2,5 @@ bower_components/
 docs/docker/
 node_modules/
 npm-debug.log
+/**/*.sqlite
+/**/*.log
