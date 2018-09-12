@@ -2,13 +2,21 @@
 
 A complete (but of complete information) version of the _truco_ subgame, with challenges.
 */
-var ChallengedTruco = exports.ChallengedTruco = declare(SubTruco, {
+var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	name: 'ChallengedTruco',
 
-	/** TODO
+	/** The constructo takes:
+	+ `table`: An array with the cards on the table,
+	+ `cardsHand`: An array with the cards on the first player's hand,
+    + `cardsFoot`: An array with the cards on the second player's hand.
+    + `globalScore`: An array with the current score of the players, regarding the global game of 30 points.
 	*/
-	constructor: function ChallengedTruco(activePlayer){
-		Game.call(this, activePlayer);
+	constructor: function ChallengedTruco(table, cardsHand, cardsFoot, globalScore) {
+        SubTruco.call(this, table, cardsHand, cardsFoot);
+        this.globalScore = globalScore;
+
+        this.trucoState = [];
+        this.currentTrucoChallenge = null;
 		// initialization
 	},
 
@@ -18,10 +26,22 @@ var ChallengedTruco = exports.ChallengedTruco = declare(SubTruco, {
 
 	// ## Game logic ###############################################################################
 
-	/** TODO
+	/** A move for `ChallengedTruco` can be either either the index of the card to be played in the
+    active player's hand or a challenge, as defined in 'static CHALLENGES'.
+    If there is a challenge currently proposed the moves are 0 or 1 as declining or accepting said
+    challenge.
 	*/
 	moves: function moves(){
-		return null;
+        var moves = SubTruco.prototype.moves.call(this);
+        if (moves) {
+            if (this.currentTrucoChallenge) {
+                // TODO: Consider possible responses to the challenge
+            } else {
+                var challengeMoves = [3];
+                Array.prototype.push.apply(moves[this.activePlayer()], challengeMoves);
+            }
+        }
+		return moves;
 	},
 
 	/** TODO
@@ -36,7 +56,17 @@ var ChallengedTruco = exports.ChallengedTruco = declare(SubTruco, {
 		return null;
 	},
 
-	// ## Utility methods ##########################################################################
+    // ## Utility methods ##########################################################################
+
+    /**
+
+     */
+    'static CHALLENGES': [
+        [], [], [],      // 0-2: Invalid
+        ["Truco"],       // 3: _Truco_ challenge, bet 2 points
+        ["ReTruco"],     // 4: _Re Truco_ challenge, bet 3 points
+        ["Vale Cuatro"], // 4: _Vale Cuatro_ challenge, bet 4 points
+    ],
 
 	/** Serialization is used in the `toString()` method, but it is also vital for sending the game
 	state across a network or the marshalling between the rendering thread and a webworker.

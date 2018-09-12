@@ -10,6 +10,7 @@ module.exports = function (grunt) {
 				'common',
 				'Truco',
 				'ai/SubTruco',
+				'ai/ChallengedTruco',
 			'__epilogue__'],
 		deps: [
 			{ id: 'creatartis-base', name: 'base' },
