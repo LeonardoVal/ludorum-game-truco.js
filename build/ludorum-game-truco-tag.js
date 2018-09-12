@@ -203,7 +203,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		return moves;
 	},
 
-	/** The table results are the matches between the cards of each player in the table. 
+	/** The table results are the matches between the cards of each player in the table.
 	*/
 	__tableResults__: function __tableResults__() {
 		var r = [];
@@ -213,10 +213,10 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		return r;
 	},
 
-	/** The round may end when both players have played two cards, if one player wins both card 
+	/** The round may end when both players have played two cards, if one player wins both card
 	matches or wins one with the other being tied. The round must end when both players have played
 	all their three cards. If the last card match is tied, the player that won the first card match
-	wins. If all three card matches are tied, the _Hand_ player wins. 
+	wins. If all three card matches are tied, the _Hand_ player wins.
 	*/
 	result: function result() {
 		var tableResults = this.__tableResults__(),
@@ -257,27 +257,27 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	// ## Utility methods #########################################################################
 
 	clone: function clone() {
-		return new this.constructor(this.table.slice(), this.cardsHand.slice(), 
+		return new this.constructor(this.table.slice(), this.cardsHand.slice(),
 			this.cardsFoot.slice());
 	},
 
-	/** The string `identifier` for a `SubTruco` state always has 7 characters. The first one 
+	/** The string `identifier` for a `SubTruco` state always has 7 characters. The first one
 	indicates the number of cards on the table. Then come the cards on the table, each encoded as
-	a character (base 36). After that come the cards of the _Hand_ player, and finally the ones of 
-	the _Foot_ player, both encoded in the same way as the cards on the table. 
+	a character (base 36). After that come the cards of the _Hand_ player, and finally the ones of
+	the _Foot_ player, both encoded in the same way as the cards on the table.
 	*/
 	identifier: function identifier() {
 		var toChar = (n) => (n - 1).toString(36);
-		return this.table.length + this.table.map(toChar).join('') + 
-			this.cardsHand.map(toChar).join('') + 
+		return this.table.length + this.table.map(toChar).join('') +
+			this.cardsHand.map(toChar).join('') +
 			this.cardsFoot.map(toChar).join('');
 	},
 
 	/** For this game suits are relevant only in the case of the sevens and the aces. Hence, cards
 	are encoded using numbers from 1 to 14. How each number may map to a given card is defined in
 	`CARDS`. Here the french deck's suits are used instead of the spanish deck's ones (because the
-	latter are not supported by Unicode). Spades and clubs are the same, diamonds are used for 
-	golds and hearts for cups.  
+	latter are not supported by Unicode). Spades and clubs are the same, diamonds are used for
+	golds and hearts for cups.
 	*/
 	'static CARDS': [
 		[],                    //  0: Invalid.
@@ -298,7 +298,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	],
 
 	/** The `enumerateCards` function returns an iterable of all possible hands for `SubTruco`. The
-	order of the cards in each players' hand is not relevant. The amount of possible cards is 
+	order of the cards in each players' hand is not relevant. The amount of possible cards is
 	checked by means of a regular expression.
 	*/
 	'static enumerateCards': function enumerateCards() {
