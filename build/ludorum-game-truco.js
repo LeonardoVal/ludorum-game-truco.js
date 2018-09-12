@@ -35,7 +35,7 @@ function __init__(base, Sermat, ludorum) { "use strict";
 
 /** # Common functions and utilities.
 
-Assorted utility functions and definitions used all over this library.
+TODO
 */
 
 /**
@@ -49,13 +49,13 @@ Assorted utility functions and definitions used all over this library.
  * Funcion que recibe por parametro la mano actual de un jugador, y retorna los posibles movimientos.
  */
 
-exports.generateMoves = function generateMoves(cards) {
+function generateMoves(cards) {
     var moves = [];
     for (var i = 0; i < cards.length; i++) {
         moves.push(i);
     }
     return moves;
-};
+}
 
 function arrEq(a, b) {
     if (a === b) return true;
