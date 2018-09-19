@@ -35,7 +35,7 @@ function __init__(base, Sermat, ludorum) { "use strict";
 
 /** # Common functions and utilities.
 
-Assorted utility functions and definitions used all over this library.
+TODO
 */
 
 /**
@@ -49,13 +49,13 @@ Assorted utility functions and definitions used all over this library.
  * Funcion que recibe por parametro la mano actual de un jugador, y retorna los posibles movimientos.
  */
 
-exports.generateMoves = function generateMoves(cards) {
+function generateMoves(cards) {
     var moves = [];
     for (var i = 0; i < cards.length; i++) {
         moves.push(i);
     }
     return moves;
-};
+}
 
 function arrEq(a, b) {
     if (a === b) return true;
@@ -273,7 +273,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	the _Foot_ player, both encoded in the same way as the cards on the table. 
 	*/
 	identifier: function identifier() {
-		var toChar = (n) => (n - 1).toString(36);
+		var toChar = (n) => n.toString(36);
 		return this.table.length + this.table.map(toChar).join('') + 
 			this.cardsHand.map(toChar).join('') + 
 			this.cardsFoot.map(toChar).join('');
@@ -309,7 +309,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	*/
 	'static enumerateCards': function enumerateCards() {
 		var It = base.Iterable,
-			baseSequence = It.product.apply(It, It.repeat(It.range(1,14), 6).toArray());
+			baseSequence = It.product.apply(It, It.repeat(It.range(1,15), 6).toArray());
 		return baseSequence.filter(function (cards) {
 			cards = cards.map((n) => n.toString(36));
 			var cardsHand = cards.slice(0, 3),
@@ -341,6 +341,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 */
 exports.__SERMAT__.include.push(SubTruco);
 Sermat.include(exports);
+
 
 // See __prologue__.js
 	Sermat.include(exports);
