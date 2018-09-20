@@ -16,7 +16,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		this.globalScore = globalScore;
 
 		this.trucoState = [];
-		this.currentTrucoChallenge = null;
+		this.raisedChallenge = null;
+		this.envidoStack = [];
 		// initialization
 	},
 
@@ -34,11 +35,43 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	moves: function moves() {
 		var moves = SubTruco.prototype.moves.call(this);
 		if (moves) {
-			if (this.currentTrucoChallenge) {
+			if (this.raisedChallenge) {
+				moves[this.activePlayer()] = [
+					ChallengedTruco.CHALLENGES.Quiero,
+					ChallengedTruco.CHALLENGES.NoQuiero
+				];
+				switch (this.raisedChallenge) {
+					case ChallengedTruco.CHALLENGES.Truco:
+						Array.prototype.push.apply(moves[this.activePlayer()], [
+							ChallengedTruco.CHALLENGES.ReTruco
+						]);
+						break;
+					case ChallengedTruco.CHALLENGES.ReTruco:
+						Array.prototype.push.apply(moves[this.activePlayer()], [
+							ChallengedTruco.CHALLENGES.ValeCuatro
+						]);
+						break;
+					case ChallengedTruco.CHALLENGES.Envido:
+						if (this.envidoStack.length === 1) {
+							Array.prototype.push.apply(moves[this.activePlayer()], [
+								ChallengedTruco.CHALLENGES.Envido
+							]);
+						}
+						Array.prototype.push.apply(moves[this.activePlayer()], [
+
+						]);
+						break;
+					case ChallengedTruco.CHALLENGES.RealEnvido:
+						break;
+				}
 				// TODO: Consider possible responses to the challenge
 			} else {
-				var challengeMoves = [3];
-				Array.prototype.push.apply(moves[this.activePlayer()], challengeMoves);
+				Array.prototype.push.apply(moves[this.activePlayer()], [
+					ChallengedTruco.CHALLENGES.Truco,
+					ChallengedTruco.CHALLENGES.Envido,
+					ChallengedTruco.CHALLENGES.RealEnvido,
+					ChallengedTruco.CHALLENGES.FaltaEnvido
+				]);
 			}
 		}
 		return moves;
@@ -61,15 +94,16 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
     /**
 
      */
-	'static CHALLENGES': [
-		[], [], [],      // 0-2: Invalid
-		["Truco"],       // 3: _Truco_ challenge, bet 2 points
-		["ReTruco"],     // 4: _Re Truco_ challenge, bet 3 points
-		["Vale Cuatro"], // 5: _Vale Cuatro_ challenge, bet 4 points
-		["Envido"], 	 // 6: _Envido_ challenge, 2 points to the winner
-		["Real Envido"], // 7: _Real Envido_ challenge, 3 points to the winner
-		["Falta Envido"], // 8: _Falta Envido_ challenge, explained below
-	],
+	'static CHALLENGES': {
+		'Truco': 3,
+		'ReTruco': 4,
+		'ValeCuatro': 5,
+		'Envido': 6,
+		'RealEnvido': 7,
+		'FaltaEnvido': 8,
+		'Quiero': 9,
+		'NoQuiero': 10
+	},
 
 	/**
 	 * The _Falta Envido_ challenge depends n the global game status. If both players are in _malas_
