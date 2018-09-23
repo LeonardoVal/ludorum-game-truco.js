@@ -360,7 +360,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		this.globalScore = globalScore;
 
 		this.trucoState = [];
-		this.raisedChallenge = null;
 		this.envidoStack = [];
 		// initialization
 	},
@@ -379,12 +378,13 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	moves: function moves() {
 		var moves = SubTruco.prototype.moves.call(this);
 		if (moves) {
-			if (this.raisedChallenge) {
+			var lastRaisedChallenge = this.envidoStack[this.envidoStack.length - 1];
+			if (lastRaisedChallenge) {
 				moves[this.activePlayer()] = [
 					ChallengedTruco.CHALLENGES.Quiero,
 					ChallengedTruco.CHALLENGES.NoQuiero
 				];
-				switch (this.raisedChallenge) {
+				switch (lastRaisedChallenge) {
 					case ChallengedTruco.CHALLENGES.Truco:
 						Array.prototype.push.apply(moves[this.activePlayer()], [
 							ChallengedTruco.CHALLENGES.ReTruco

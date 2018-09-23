@@ -214,7 +214,12 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 		it("has challenges as possible moves", function() {
 			var game = new ludorum_game_truco.ai.ChallengedTruco([], [2, 4, 6], [1, 3, 5]);
 
-			expect(game.moves().Hand).toEqual([0, 1, 2, 3, 6, 7, 8]);
+			expect(game.moves().Hand).toEqual([0, 1, 2,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Truco,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.RealEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
+			]);
 			expect(game.moves().Foot).toBeFalsy();
 			// Switch to foot
 			//expect(game.moves().Foot).toEqual([0, 1, 2]);
