@@ -56,8 +56,6 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 			expect(gameT.result()).toBeFalsy();
 
-			// TODO: Test games with 'pardas', all possible combinations
-
 			// SIN EMPATE: gana el que haya ganado 2 manos
 			theWinnerIs([12, 5, 8], [6, 7, 5], 'Hand');
 			theWinnerIs([2, 3, 6], [14, 1, 7], 'Foot');

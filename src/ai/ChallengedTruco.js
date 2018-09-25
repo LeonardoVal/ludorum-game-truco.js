@@ -15,9 +15,15 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		SubTruco.call(this, table, cardsHand, cardsFoot);
 		this.globalScore = globalScore;
 
+		this.pointsWorth = 1; // To be updated on truco-kind challenges.
+		this.canUpChallenge = null; // A player that can up the challenge later
+
 		 // Collect up to now raised challenges
 		this.envidoStack = [];
+		this.envidoOver = false; // TODO: Update envidoOver when a challenge is raised/answered
+
 		this.trucoStack = [];
+		this.trucoOver = false; // TODO: Update trucoOver when a challenge is raised/answered
 	},
 
 	/** The players' roles in a ChallengedTruco match are `"Hand"` (_Mano_) and `"Foot"` (_Pie_).
@@ -36,7 +42,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		if (moves) {
 			var envidoChallenge = this.envidoStack[this.envidoStack.length - 1];
 			var trucoChallenge = this.trucoStack[this.trucoStack.length - 1];
-			if (envidoChallenge) {
+			if (envidoChallenge && (!this.envidoOver) &&  (this.table.length < 2)) {
 				moves[this.activePlayer()] = [
 					ChallengedTruco.CHALLENGES.Quiero,
 					ChallengedTruco.CHALLENGES.NoQuiero
@@ -60,7 +66,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 						]);
 						break;
 				}
-			} else if (trucoChallenge) {
+			} else if (trucoChallenge && (!this.trucoOver)) {
 				moves[this.activePlayer()] = [
 					ChallengedTruco.CHALLENGES.Quiero,
 					ChallengedTruco.CHALLENGES.NoQuiero
@@ -77,7 +83,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 						]);
 						break;
 				}
-				// TODO: Consider possible responses to the challenge
 			} else {
 				Array.prototype.push.apply(moves[this.activePlayer()], [
 					ChallengedTruco.CHALLENGES.Truco,
@@ -108,7 +113,61 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 		if (move > 2) {
 			var that = update ? this : this.clone();
-			// TODO: Alter game state based on the raised challenge or response
+			var envidoChallenge = that.envidoStack[that.envidoStack.length - 1];
+			var trucoChallenge = that.trucoStack[that.trucoStack.length - 1];
+			switch (move) {
+				case ChallengedTruco.CHALLENGES.Quiero:
+					if (envidoChallenge) {
+						var handEnvido = envidoTotal(that.cardsHand);
+						var footEnvido = envidoTotal(that.cardsFoot);
+						var envidoWinner = handEnvido > footEnvido ? 'Hand' : 'Foot';
+						// TODO: (meeting) How are the different ENVIDO scores published
+						// in Game.result()?
+						var envidoPoints = that.envidoStackWorth()[0];
+					} else if (trucoChallenge) {
+						that.pointsWorth = that.trucoStackWorth();
+						if (trucoChallenge != ChallengedTruco.CHALLENGES.ValeCuatro) {
+							that.canUpChallenge = activePlayer;
+						}
+					} else {
+						// IMPOSSIBLE
+					}
+					break;
+				case ChallengedTruco.CHALLENGES.NoQuiero:
+					if (envidoChallenge) {
+						var envidoPoints = that.envidoStackWorth()[1];
+						// TODO: Assign score to the challenging player, game continues
+					} else if (trucoChallenge) {
+						var challengerScore = that.trucoStackWorth() - 1;
+						// TODO: Assign score to the challenging player, game over
+					} else {
+						// IMPOSSIBLE
+					}
+					break;
+
+				case ChallengedTruco.CHALLENGES.Truco:
+					that.canUpChallenge = null;
+					that.trucoStack.push(ChallengedTruco.CHALLENGES.Truco);
+					break;
+				case ChallengedTruco.CHALLENGES.ReTruco:
+					that.canUpChallenge = null;
+					that.trucoStack.push(ChallengedTruco.CHALLENGES.ReTruco);
+					break;
+				case ChallengedTruco.CHALLENGES.ValeCuatro:
+					that.canUpChallenge = null;
+					that.trucoStack.push(ChallengedTruco.CHALLENGES.ValeCuatro);
+					break;
+				case ChallengedTruco.CHALLENGES.Envido:
+					that.envidoStack.push(ChallengedTruco.CHALLENGES.Envido);
+					break;
+				case ChallengedTruco.CHALLENGES.RealEnvido:
+					that.envidoStack.push(ChallengedTruco.CHALLENGES.RealEnvido);
+					break;
+				case ChallengedTruco.CHALLENGES.FaltaEnvido:
+					that.envidoStack.push(ChallengedTruco.CHALLENGES.FaltaEnvido);
+					break;
+
+			}
 
 		} else {
 			return SubTruco.prototype.next.call(this, moves, haps, update);
@@ -132,6 +191,74 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		return cloned_game;
 	},
 
+	trucoStackWorth: function trucoStackWorth() {
+		return this.trucoStack.length + 1;
+		// Truco: 2
+		// Truco, ReTruco: 3
+		// TRUCO; ReTruco, ValeCuatro: 4
+	},
+
+	/**
+	 * When envido challenges are called their effect is cumulative. If an _Envido_ is answered to
+	 * with a _Real Envido_ then it is worth 5 (2 + 3) points. Not all sequences are allowed.
+	 * Below is the list of allowed _Envido_ type challenge chains, along with the points given to
+	 * the winner or when it is declined.
+	 *
+	 * E               2/1
+	 * RE              3/1
+	 * FE              x/1
+	 * E, E            4/2
+	 * E, RE           5/2
+	 * E, E, RE        7/4
+	 * E, E, RE, FE    x/7
+	 * E, FE           x/2
+	 * RE, FE          x/3
+	 * E, E, FE        x/4
+	 * E, RE, FE       x/5
+	 */
+	envidoStackWorth: function envidoStackWorth() {
+		if (this.envidoStack.length) {
+			return null;
+		}
+		var wanted = 1;
+		var notWanted = 0;
+		for (var i = 0; i < this.envidoStack.length; i++) {
+			notWanted = wanted;
+			switch (this.envidoStack[i]) {
+				case ChallengedTruco.CHALLENGES.Envido:
+					wanted += 2;
+					break;
+				case ChallengedTruco.CHALLENGES.RealEnvido:
+					notWanted = wanted;
+					wanted += 3;
+					break;
+				case ChallengedTruco.CHALLENGES.FaltaEnvido:
+					return [this.faltaEnvidoScore(), notWanted];
+			}
+		}
+		return [wanted, notWanted];
+	},
+
+	/**
+	 * The _Falta Envido_ challenge depends on the global game status. If both players are in
+	 * _malas_ (up to 15 points each), the player that wins the _Falta Envido_ wins the  global
+	 * game. If at least one player is above 15 points this challenge is worth the amount of points
+	 * necessary for the winning player to win the global game.
+	 */
+	faltaEnvidoScore: function faltaEnvidoScore() {
+		var handGlobal = this.globalScore[0];
+		var footGlobal = this.globalScore[1];
+		if (handGlobal <= 15 && footGlobal <= 15) {
+			if (this.activePlayer() === 'Hand') {
+				return 30 - handGlobal;
+			} else {
+				return 30 - footGlobal;
+			}
+		} else {
+			return 30 - Math.max(handGlobal, footGlobal);
+		}
+	},
+
     /**
 
      */
@@ -146,28 +273,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		'NoQuiero': 10
 	},
 
-	/**
-	 * The _Falta Envido_ challenge depends n the global game status. If both players are in _malas_
-	 * (up to 15 points each), the player that wins the _Falta Envido_ wins the global game. If at least
-	 * one player is above 15 points this challenge is worth the amount of points necessary for the winning
-	 * player to win the global game.
-	 *
-	 * When envido challenges are called their effect is cumulative. If an _Envido_ is answered to with a
-	 * _Real Envido_ then it is worth 5 (2 + 3) points. Not all sequences are allowed. Below is the list
-	 * of allowed _Envido_ type challenge chains, along with the points given to the winner or when it is declined.
-	 *
-	 * E               2/1
-	 * RE              3/1
-	 * FE              x/1
-	 * E, E            4/2
-	 * E, RE           5/2
-	 * E, E, RE        7/4
-	 * E, E, RE, FE    x/7
-	 * E, FE           x/2
-	 * RE, FE          x/3
-	 * E, E, FE        x/4
-	 * E, RE, FE       x/5
-	 */
 
 	/** Serialization is used in the `toString()` method, but it is also vital for sending the game
 	state across a network or the marshalling between the rendering thread and a webworker.
