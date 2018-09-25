@@ -15,7 +15,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		SubTruco.call(this, table, cardsHand, cardsFoot);
 		this.globalScore = globalScore;
 
-		this.trucoState = [];
+		 // Collect up to now raised challenges
 		this.envidoStack = [];
 		this.trucoStack = [];
 	},
@@ -41,6 +41,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					ChallengedTruco.CHALLENGES.Quiero,
 					ChallengedTruco.CHALLENGES.NoQuiero
 				];
+
 				switch (envidoChallenge) {
 					case ChallengedTruco.CHALLENGES.Envido:
 						if (this.envidoStack.length === 1) {
@@ -49,11 +50,21 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 							]);
 						}
 						Array.prototype.push.apply(moves[this.activePlayer()], [
-
+							ChallengedTruco.CHALLENGES.RealEnvido,
+							ChallengedTruco.CHALLENGES.FaltaEnvido,
+						]);
+						break;
+					case ChallengedTruco.CHALLENGES.RealEnvido:
+						Array.prototype.push.apply(moves[this.activePlayer()], [
+							ChallengedTruco.CHALLENGES.FaltaEnvido,
 						]);
 						break;
 				}
 			} else if (trucoChallenge) {
+				moves[this.activePlayer()] = [
+					ChallengedTruco.CHALLENGES.Quiero,
+					ChallengedTruco.CHALLENGES.NoQuiero
+				];
 				switch (lastRaisedChallenge) {
 					case ChallengedTruco.CHALLENGES.Truco:
 						Array.prototype.push.apply(moves[this.activePlayer()], [
@@ -65,17 +76,19 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 							ChallengedTruco.CHALLENGES.ValeCuatro
 						]);
 						break;
-					case ChallengedTruco.CHALLENGES.RealEnvido:
-						break;
 				}
 				// TODO: Consider possible responses to the challenge
 			} else {
 				Array.prototype.push.apply(moves[this.activePlayer()], [
 					ChallengedTruco.CHALLENGES.Truco,
-					ChallengedTruco.CHALLENGES.Envido,
-					ChallengedTruco.CHALLENGES.RealEnvido,
-					ChallengedTruco.CHALLENGES.FaltaEnvido
 				]);
+				if (this.table.length <= 1) {
+					Array.prototype.push.apply(moves[this.activePlayer()], [
+						ChallengedTruco.CHALLENGES.Envido,
+						ChallengedTruco.CHALLENGES.RealEnvido,
+						ChallengedTruco.CHALLENGES.FaltaEnvido
+					]);
+				}
 			}
 		}
 		return moves;
