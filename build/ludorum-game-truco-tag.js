@@ -435,16 +435,40 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	/** TODO
 	*/
 	result: function result() {
-		return null;
+		return SubTruco.prototype.result.call(this);
 	},
 
 	/** TODO
 	*/
 	next: function next(moves, haps, update) {
+		var activePlayer = this.activePlayer();
+		var move = +moves[activePlayer];
+
+		if (move > 2) {
+			var that = update ? this : this.clone();
+			// TODO: Alter game state based on the raised challenge or response
+
+		} else {
+			return SubTruco.prototype.next.call(this, moves, haps, update);
+		}
+
 		return null;
 	},
 
 	// ## Utility methods ##########################################################################
+
+	clone: function clone() {
+		var cloned_game = new this.constructor(
+			this.table.slice(),
+			this.cardsHand.slice(),
+			this.cardsFoot.slice(),
+			this.globalScore);
+
+		cloned_game.envidoStack = this.envidoStack.slice();
+		cloned_game.trucoStack = this.trucoStack.slice();
+
+		return cloned_game;
+	},
 
     /**
 
