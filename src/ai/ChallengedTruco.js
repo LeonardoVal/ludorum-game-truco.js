@@ -15,15 +15,14 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		SubTruco.call(this, table, cardsHand, cardsFoot);
 		this.globalScore = globalScore;
 
-		this.pointsWorth = 1; // To be updated on truco-kind challenges.
-		this.canUpChallenge = null; // A player that can up the challenge later
-
-		 // Collect up to now raised challenges
+		 // _Envido_ related
 		this.envidoStack = [];
-		this.envidoOver = false; // TODO: Update envidoOver when a challenge is raised/answered
+		this.envidoGoing = false; // TODO: Update envidoGoing when a challenge is raised/answered
 
+		// _Truco_ related
 		this.trucoStack = [];
-		this.trucoOver = false; // TODO: Update trucoOver when a challenge is raised/answered
+		this.trucoGoing = false; // TODO: Update trucoGoing when a challenge is raised/answered
+		this.canUpChallenge = null; // A player that can up the challenge later
 	},
 
 	/** The players' roles in a ChallengedTruco match are `"Hand"` (_Mano_) and `"Foot"` (_Pie_).
@@ -38,62 +37,31 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
     challenge.
 	*/
 	moves: function moves() {
-		var moves = SubTruco.prototype.moves.call(this);
-		if (moves) {
-			var envidoChallenge = this.envidoStack[this.envidoStack.length - 1];
-			var trucoChallenge = this.trucoStack[this.trucoStack.length - 1];
-			if (envidoChallenge && (!this.envidoOver) &&  (this.table.length < 2)) {
-				moves[this.activePlayer()] = [
-					ChallengedTruco.CHALLENGES.Quiero,
-					ChallengedTruco.CHALLENGES.NoQuiero
-				];
+		var envidoChall = this.getEnvidoChallenge();
+		var trucoChall = this.getTrucoChallenge();
 
-				switch (envidoChallenge) {
-					case ChallengedTruco.CHALLENGES.Envido:
-						if (this.envidoStack.length === 1) {
-							Array.prototype.push.apply(moves[this.activePlayer()], [
-								ChallengedTruco.CHALLENGES.Envido
-							]);
-						}
-						Array.prototype.push.apply(moves[this.activePlayer()], [
-							ChallengedTruco.CHALLENGES.RealEnvido,
-							ChallengedTruco.CHALLENGES.FaltaEnvido,
-						]);
-						break;
-					case ChallengedTruco.CHALLENGES.RealEnvido:
-						Array.prototype.push.apply(moves[this.activePlayer()], [
-							ChallengedTruco.CHALLENGES.FaltaEnvido,
-						]);
-						break;
-				}
-			} else if (trucoChallenge && (!this.trucoOver)) {
-				moves[this.activePlayer()] = [
-					ChallengedTruco.CHALLENGES.Quiero,
-					ChallengedTruco.CHALLENGES.NoQuiero
-				];
-				switch (lastRaisedChallenge) {
-					case ChallengedTruco.CHALLENGES.Truco:
-						Array.prototype.push.apply(moves[this.activePlayer()], [
-							ChallengedTruco.CHALLENGES.ReTruco
-						]);
-						break;
-					case ChallengedTruco.CHALLENGES.ReTruco:
-						Array.prototype.push.apply(moves[this.activePlayer()], [
-							ChallengedTruco.CHALLENGES.ValeCuatro
-						]);
-						break;
-				}
-			} else {
-				Array.prototype.push.apply(moves[this.activePlayer()], [
-					ChallengedTruco.CHALLENGES.Truco,
-				]);
-				if (this.table.length <= 1) {
-					Array.prototype.push.apply(moves[this.activePlayer()], [
-						ChallengedTruco.CHALLENGES.Envido,
-						ChallengedTruco.CHALLENGES.RealEnvido,
-						ChallengedTruco.CHALLENGES.FaltaEnvido
-					]);
-				}
+		var moves = SubTruco.prototype.moves.call(this);
+
+		if (this.envidoGoing) {
+			moves[this.activePlayer()] = [
+				ChallengedTruco.CHALLENGES.Quiero,
+				ChallengedTruco.CHALLENGES.NoQuiero
+			];
+			Array.prototype.push.apply(moves[this.activePlayer()], this.envidoResponses());
+		} else if (this.trucoGoing) {
+			moves[this.activePlayer()] = [
+				ChallengedTruco.CHALLENGES.Quiero,
+				ChallengedTruco.CHALLENGES.NoQuiero
+			];
+			Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses());
+		} else {
+			// No challenges are in negotiation. Can raise new ones or play normally
+			if (this.table.length < 2) {
+				Array.prototype.push.apply(moves[this.activePlayer()], this.envidoResponses());
+			}
+
+			if (!trucoChall || this.canUpChallenge === this.activePlayer()) {
+				Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses());
 			}
 		}
 		return moves;
@@ -111,66 +79,57 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		var activePlayer = this.activePlayer();
 		var move = +moves[activePlayer];
 
-		if (move > 2) {
+		if (move <= 2) {
+			return SubTruco.prototype.next.call(this, moves, haps, update);
+		} else {
 			var that = update ? this : this.clone();
-			var envidoChallenge = that.envidoStack[that.envidoStack.length - 1];
-			var trucoChallenge = that.trucoStack[that.trucoStack.length - 1];
+			var envidoChallenge = that.getEnvidoChallenge();
+			var trucoChall = that.getTrucoChallenge();
+
 			switch (move) {
 				case ChallengedTruco.CHALLENGES.Quiero:
 					if (envidoChallenge) {
 						var handEnvido = envidoTotal(that.cardsHand);
 						var footEnvido = envidoTotal(that.cardsFoot);
-						var envidoWinner = handEnvido > footEnvido ? 'Hand' : 'Foot';
+						var envidoWinner = handEnvido >= footEnvido ? 'Hand' : 'Foot';
+						var envidoWinPoints = that.envidoStackWorth()[0];
+						that.envidoGoing = false;
 						// TODO: (meeting) How are the different ENVIDO scores published
 						// in Game.result()?
-						var envidoPoints = that.envidoStackWorth()[0];
-					} else if (trucoChallenge) {
-						that.pointsWorth = that.trucoStackWorth();
-						if (trucoChallenge != ChallengedTruco.CHALLENGES.ValeCuatro) {
-							that.canUpChallenge = activePlayer;
-						}
-					} else {
-						// IMPOSSIBLE
-					}
+					} else if (trucoChall) {
+						that.trucoGoing = false;
+						that.canUpChallenge =
+							trucoChall != ChallgruengedTruco.CHALLENGES.ValeCuatro ? activePlayer : null;
+					} else { /* IMPOSSIBLE */ }
 					break;
+
 				case ChallengedTruco.CHALLENGES.NoQuiero:
 					if (envidoChallenge) {
-						var envidoPoints = that.envidoStackWorth()[1];
+						that.envidoGoing = false;
+						var envidoNotWantedPoints = that.envidoStackWorth()[1];
 						// TODO: Assign score to the challenging player, game continues
 					} else if (trucoChallenge) {
+						that.trucoGoing = false;
 						var challengerScore = that.trucoStackWorth() - 1;
 						// TODO: Assign score to the challenging player, game over
-					} else {
-						// IMPOSSIBLE
-					}
+					} else { /* IMPOSSIBLE */ }
 					break;
 
 				case ChallengedTruco.CHALLENGES.Truco:
-					that.canUpChallenge = null;
-					that.trucoStack.push(ChallengedTruco.CHALLENGES.Truco);
-					break;
 				case ChallengedTruco.CHALLENGES.ReTruco:
-					that.canUpChallenge = null;
-					that.trucoStack.push(ChallengedTruco.CHALLENGES.ReTruco);
-					break;
 				case ChallengedTruco.CHALLENGES.ValeCuatro:
 					that.canUpChallenge = null;
-					that.trucoStack.push(ChallengedTruco.CHALLENGES.ValeCuatro);
+					that.trucoGoing = true;
+					that.trucoStack.push(move);
 					break;
+
 				case ChallengedTruco.CHALLENGES.Envido:
-					that.envidoStack.push(ChallengedTruco.CHALLENGES.Envido);
-					break;
 				case ChallengedTruco.CHALLENGES.RealEnvido:
-					that.envidoStack.push(ChallengedTruco.CHALLENGES.RealEnvido);
-					break;
 				case ChallengedTruco.CHALLENGES.FaltaEnvido:
-					that.envidoStack.push(ChallengedTruco.CHALLENGES.FaltaEnvido);
+					that.envidoGoing = true;
+					that.envidoStack.push(move);
 					break;
-
 			}
-
-		} else {
-			return SubTruco.prototype.next.call(this, moves, haps, update);
 		}
 
 		return null;
@@ -196,6 +155,14 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		// Truco: 2
 		// Truco, ReTruco: 3
 		// TRUCO; ReTruco, ValeCuatro: 4
+	},
+
+	getEnvidoChallenge: function() {
+		return this.envidoStack[this.envidoStack.length - 1];
+	},
+
+	getTrucoChallenge: function() {
+		return this.trucoStack[this.trucoStack.length - 1];
 	},
 
 	/**
@@ -237,6 +204,42 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 			}
 		}
 		return [wanted, notWanted];
+	},
+
+	envidoResponses: function envidoResponses() {
+		var envidoChall = this.getEnvidoChallenge();
+		var possibleMoves = [];
+
+		if (!envidoChall || envidoChall < ChallengedTruco.CHALLENGES.FaltaEnvido) {
+			possibleMoves.push(ChallengedTruco.CHALLENGES.FaltaEnvido);
+		}
+
+		if (!envidoChall || envidoChall < ChallengedTruco.CHALLENGES.RealEnvido) {
+			possibleMoves.push(ChallengedTruco.CHALLENGES.RealEnvido);
+		}
+
+		if (!envidoChall || envidoChall < ChallengedTruco.CHALLENGES.Envido) {
+			possibleMoves.push(ChallengedTruco.CHALLENGES.Envido);
+		}
+
+		if (envidoChall === ChallengedTruco.CHALLENGES.Envido && this.envidoStack.length === 1) {
+			possibleMoves.push(ChallengedTruco.CHALLENGES.Envido);
+		}
+
+		return possibleMoves;
+	},
+
+	trucoResponses: function trucoResponses() {
+		var trucoChall = this.getTrucoChallenge();
+
+		switch (trucoChall) {
+			case ChallengedTruco.CHALLENGES.Truco:
+				return [ChallengedTruco.CHALLENGES.ReTruco];
+			case ChallengedTruco.CHALLENGES.ReTruco:
+				return [ChallengedTruco.CHALLENGES.ValeCuatro];
+			default:
+				return [ChallengedTruco.CHALLENGES.Truco];
+		}
 	},
 
 	/**
