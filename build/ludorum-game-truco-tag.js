@@ -633,6 +633,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 exports.__SERMAT__.include.push(ChallengedTruco);
 Sermat.include(exports);
 
+
 // See __prologue__.js
 	Sermat.include(exports);
 	
