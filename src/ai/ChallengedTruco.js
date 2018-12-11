@@ -99,7 +99,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					} else if (trucoChall) {
 						that.trucoGoing = false;
 						that.canUpChallenge =
-							trucoChall != ChallgruengedTruco.CHALLENGES.ValeCuatro ? activePlayer : null;
+							trucoChall != ChallengedTruco.CHALLENGES.ValeCuatro ? activePlayer : null;
 					} else { /* IMPOSSIBLE */ }
 					break;
 
@@ -108,7 +108,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 						that.envidoGoing = false;
 						var envidoNotWantedPoints = that.envidoStackWorth()[1];
 						// TODO: Assign score to the challenging player, game continues
-					} else if (trucoChallenge) {
+					} else if (trucoChall) {
 						that.trucoGoing = false;
 						var challengerScore = that.trucoStackWorth() - 1;
 						// TODO: Assign score to the challenging player, game over
@@ -130,6 +130,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					that.envidoStack.push(move);
 					break;
 			}
+			that.activatePlayers(this.opponent());
 			return that;
 		}
 	},

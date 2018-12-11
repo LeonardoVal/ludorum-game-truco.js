@@ -209,6 +209,13 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 	});
 
 	describe("ludorum-game-challengedtruco", function() {
+		var chall_truco =  ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Truco;
+		var chall_retruco =  ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.ReTruco;
+		var chall_quiero = ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Quiero;
+		var chall_noquiero = ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.NoQuiero;
+
+
+
 		it("has challenges as possible moves", function() {
 			var game = new ludorum_game_truco.ai.ChallengedTruco([], [2, 4, 6], [1, 3, 5]);
 
@@ -216,7 +223,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.RealEnvido,
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
-				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Truco,
+				chall_truco,
 			]);
 			expect(game.moves().Foot).toBeFalsy();
 			// Switch to foot
@@ -227,20 +234,43 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.RealEnvido,
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
-				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Truco,
+				chall_truco,
 			]);
 		});
 		
 		it("answers to truco challenges correctly", function() {
 			var game = new ludorum_game_truco.ai.ChallengedTruco([], [2, 4, 6], [1, 3, 5]);
 			
-			
-			game = game.next({'Hand': ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Truco});
+			// El jugador mano desafía al truco
+			game = game.next({'Hand': chall_truco});
+			expect(game.cardsHand).toEqual([2, 4, 6]);
+			expect(game.cardsFoot).toEqual([1, 3, 5]);
+			expect(game.table).toEqual([]);
+			expect(game.activePlayer()).toBe('Foot');
+			expect(game.result()).toBeFalsy();
 
 			expect(game.moves().Foot).toEqual([
-				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Quiero, 
-				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.NoQuiero, 
+				chall_quiero, 
+				chall_noquiero, 
+				chall_retruco,
 			]);
+
+
+			// Caso el pie rechace el desafio la partida termina
+			gameNoQuerido = game.next({'Foot': chall_noquiero});
+			expect(gameNoQuerido.result()).toEqual({'Foot': -1, 'Hand': 1});
+
+			// De querer el truco el juego sigue pero solo el pie (quien aceptó)
+			// puede aumentar la apuesta (re truco)
+			gameQuerido = game.next({'Foot': chall_quiero});
+			expect(gameQuerido.cardsHand).toEqual([2, 4, 6]);
+			expect(gameQuerido.cardsFoot).toEqual([1, 3, 5]);
+			expect(gameQuerido.table).toEqual([]);
+			expect(gameQuerido.activePlayer()).toBe('Hand');
+			expect(gameQuerido.result()).toBeFalsy();
+
+			// El mano no puede aumentar la apuesta del truco y ya no puede cantar envido
+			expect(gameQuerido.moves().Hand).toEqual([0, 1, 2]);
 
 
 		});
