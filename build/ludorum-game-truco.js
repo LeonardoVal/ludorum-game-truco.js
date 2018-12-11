@@ -474,9 +474,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					that.envidoStack.push(move);
 					break;
 			}
+			return that;
 		}
-
-		return null;
 	},
 
 	// ## Utility methods ##########################################################################
