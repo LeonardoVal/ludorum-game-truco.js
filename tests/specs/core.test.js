@@ -222,8 +222,13 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			// Switch to foot
 			//expect(game.moves().Foot).toEqual([0, 1, 2]);
 
-			var game2 = new ludorum_game_truco.ai.SubTruco([], [2], [1]);
-			expect(game2.moves().Hand).toEqual([0]);
+			var game2 = new ludorum_game_truco.ai.ChallengedTruco([], [2], [1]);
+			expect(game2.moves().Hand).toEqual([0,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.RealEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Truco,
+			]);
 
 		});
 	});
