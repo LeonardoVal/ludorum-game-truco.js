@@ -5,15 +5,21 @@ A complete (but of complete information) version of the _truco_ subgame, with ch
 var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	name: 'ChallengedTruco',
 
-	/** The constructo takes:
-	+ `table`: An array with the cards on the table,
-	+ `cardsHand`: An array with the cards on the first player's hand,
-    + `cardsFoot`: An array with the cards on the second player's hand.
-    + `globalScore`: An array with the current score of the players, regarding the global game of 30 points.
-	*/
+	/** The constructor takes:
+	 *
+	 * `table`: An array with the cards on the table,
+	 * `cardsHand`: An array with the cards on the first player's hand,
+	 * `cardsFoot`: An array with the cards on the second player's hand.
+	 * `globalScore`: An object with the current score of the players, regarding the global game of 30 points.
+	 */
 	constructor: function ChallengedTruco(table, cardsHand, cardsFoot, globalScore) {
 		SubTruco.call(this, table, cardsHand, cardsFoot);
-		this.globalScore = globalScore;
+
+		if (!globalScore) {
+			this.globalScore = {'Hand': 0, 'Foot': 0};
+		} else {
+			this.globalScore = globalScore;
+		}
 
 		 // _Envido_ related
 		this.envidoStack = [];
@@ -31,11 +37,11 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 	// ## Game logic ###############################################################################
 
-	/** A move for `ChallengedTruco` can be either either the index of the card to be played in the
-    active player's hand or a challenge, as defined in 'static CHALLENGES'.
-    If there is a challenge currently proposed the moves are 0 or 1 as declining or accepting said
-    challenge.
-	*/
+	/**
+	 * A move in `ChallengedTruco` can be either either a `SubTruco` move or a challenge, as defined
+	 * in 'static CHALLENGES'. If there is a challenge currently proposed the moves are declining or
+	 * accepting said challenge, or in  some cases upping the bet.
+	 */
 	moves: function moves() {
 		var envidoChall = this.getEnvidoChallenge();
 		var trucoChall = this.getTrucoChallenge();
@@ -249,8 +255,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	 * necessary for the winning player to win the global game.
 	 */
 	faltaEnvidoScore: function faltaEnvidoScore() {
-		var handGlobal = this.globalScore[0];
-		var footGlobal = this.globalScore[1];
+		var handGlobal = this.globalScore.Hand;
+		var footGlobal = this.globalScore.Foot;
 		if (handGlobal <= 15 && footGlobal <= 15) {
 			if (this.activePlayer() === 'Hand') {
 				return 30 - handGlobal;
