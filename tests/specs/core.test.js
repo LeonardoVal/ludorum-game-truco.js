@@ -209,8 +209,9 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 	});
 
 	describe("ludorum-game-challengedtruco", function() {
-		var chall_truco =  ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Truco;
-		var chall_retruco =  ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.ReTruco;
+		var chall_truco = ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Truco;
+		var chall_retruco = ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.ReTruco;
+		var chall_valecuatro = ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.ValeCuatro;
 		var chall_quiero = ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Quiero;
 		var chall_noquiero = ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.NoQuiero;
 
@@ -249,6 +250,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(game.activePlayer()).toBe('Foot');
 			expect(game.result()).toBeFalsy();
 
+			// TODO: Puede cantarse envido ante de contestar al 'Truco'
 			expect(game.moves().Foot).toEqual([
 				chall_quiero, 
 				chall_noquiero, 
@@ -260,19 +262,34 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			gameNoQuerido = game.next({'Foot': chall_noquiero});
 			expect(gameNoQuerido.result()).toEqual({'Foot': -1, 'Hand': 1});
 
+
 			// De querer el truco el juego sigue pero solo el pie (quien aceptó)
 			// puede aumentar la apuesta (re truco)
 			gameQuerido = game.next({'Foot': chall_quiero});
 			expect(gameQuerido.cardsHand).toEqual([2, 4, 6]);
 			expect(gameQuerido.cardsFoot).toEqual([1, 3, 5]);
 			expect(gameQuerido.table).toEqual([]);
-			expect(gameQuerido.activePlayer()).toBe('Hand');
-			expect(gameQuerido.result()).toBeFalsy();
 
 			// El mano no puede aumentar la apuesta del truco y ya no puede cantar envido
+			expect(gameQuerido.activePlayer()).toBe('Hand');
+			expect(gameQuerido.result()).toBeFalsy();
 			expect(gameQuerido.moves().Hand).toEqual([0, 1, 2]);
+			gameQuerido = gameQuerido.next({'Hand': 0});
+
+			// El jugador con el quiero puede aumentar la apuesta cantando retruco
+			expect(gameQuerido.activePlayer()).toBe('Foot');
+			expect(gameQuerido.moves().Foot).toEqual([0, 1, 2, chall_retruco]);
 
 
+			// El jugador puede contestar al desafío aumentando la apuesta (cantando retruco sin pasar por el quiero)
+			// En este caso el mano debe contestar al desafío.
+			gameRetruco = game.next({'Foot': chall_retruco}); 
+			expect(gameRetruco.activePlayer()).toBe('Hand');
+			expect(gameRetruco.result()).toBeFalsy();
+			expect(gameRetruco.moves().Hand).toEqual([chall_quiero, chall_noquiero, chall_valecuatro]);
+
+			// TODO: El turno debe volvera  quien inicia la cadena.
+			// e.g. Mano: truco, Pie: retruco (al llegar a un `quiero` será el turno del mano)
 		});
 	});
 
