@@ -290,6 +290,11 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 			// TODO: El turno debe volvera  quien inicia la cadena.
 			// e.g. Mano: truco, Pie: retruco (al llegar a un `quiero` será el turno del mano)
+			gameRetruco = gameRetruco.next({'Hand': chall_quiero});
+			expect(gameRetruco.activePlayer()).toBe('Hand'); 
+			// TODO: Esta parida vale 3 puntos
+			expect(gameRetruco.result()).toBeFalsy();
+			expect(gameRetruco.moves().Hand).toEqual([0, 1, 2, chall_valecuatro]);
 		});
 	});
 
