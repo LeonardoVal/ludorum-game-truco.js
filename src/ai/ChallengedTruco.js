@@ -15,6 +15,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	constructor: function ChallengedTruco(table, cardsHand, cardsFoot, globalScore) {
 		SubTruco.call(this, table, cardsHand, cardsFoot);
 
+		this.trucoWinner = null;
+
 		if (!globalScore) {
 			this.globalScore = {'Hand': 0, 'Foot': 0};
 		} else {
@@ -80,7 +82,13 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 	/** Gives the result of the game */
 	result: function result() {
-		return SubTruco.prototype.result.call(this);
+		var sub = SubTruco.prototype.result.call(this);
+		if (sub) {
+			return sub;
+		} else if (this.trucoWinner) {
+			// TODO: Assign score to the challenging player, game over
+			return this.victory(this.trucoWinner);
+		}
 	},
 
 	/**
@@ -88,6 +96,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	 * the `SubTruco` move or dealing with a posed or answered challenge.
 	 */
 	next: function next(moves, haps, update) {
+		base.raiseIf(this.result(), "Game is finished!");
 		var activePlayer = this.activePlayer();
 		var move = +moves[activePlayer];
 
@@ -123,7 +132,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					} else if (trucoChall) {
 						that.trucoGoing = false;
 						var challengerScore = that.trucoStackWorth() - 1;
-						// TODO: Assign score to the challenging player, game over
+						var op = this.opponent();
+						that.trucoWinner = op;
 					} else { /* IMPOSSIBLE */ }
 					break;
 
