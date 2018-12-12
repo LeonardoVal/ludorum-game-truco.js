@@ -31,8 +31,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		this.canUpChallenge = null; // A player that can up the challenge later
 	},
 
-	/** The players' roles in a ChallengedTruco match are `"Hand"` (_Mano_) and `"Foot"` (_Pie_).
-	*/
+	/** The players' roles in a ChallengedTruco match are `"Hand"` (_Mano_) and `"Foot"` (_Pie_). */
 	players: ["Hand", "Foot"],
 
 	// ## Game logic ###############################################################################
@@ -73,14 +72,15 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		return moves;
 	},
 
-	/** TODO
-	*/
+	/** Gives the result of the game */
 	result: function result() {
 		return SubTruco.prototype.result.call(this);
 	},
 
-	/** TODO
-	*/
+	/**
+	 * Changes the state of the game (mutating if `update` is `true`) by either applying
+	 * the `SubTruco` move or dealing with a posed or answered challenge.
+	 */
 	next: function next(moves, haps, update) {
 		var activePlayer = this.activePlayer();
 		var move = +moves[activePlayer];
@@ -143,6 +143,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 	// ## Utility methods ##########################################################################
 
+	/** Clones the game to create apparently inmutable progression **/
 	clone: function clone() {
 		var cloned_game = new this.constructor(
 			this.table.slice(),
@@ -156,6 +157,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		return cloned_game;
 	},
 
+	/** Calculates the value of the game based on the trucoStack **/
 	trucoStackWorth: function trucoStackWorth() {
 		return this.trucoStack.length + 1;
 		// Truco: 2
@@ -175,7 +177,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	 * When envido challenges are called their effect is cumulative. If an _Envido_ is answered to
 	 * with a _Real Envido_ then it is worth 5 (2 + 3) points. Not all sequences are allowed.
 	 * Below is the list of allowed _Envido_ type challenge chains, along with the points given to
-	 * the winner or when it is declined.
+	 * the winner, or to the caller when it is not accepted.
 	 *
 	 * E               2/1
 	 * RE              3/1
@@ -268,9 +270,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		}
 	},
 
-    /**
-
-     */
 	'static CHALLENGES': {
 		'Truco': 3,
 		'ReTruco': 4,
