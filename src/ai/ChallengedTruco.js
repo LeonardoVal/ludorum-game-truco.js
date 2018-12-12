@@ -43,7 +43,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	 */
 	moves: function moves() {
 		var envidoChall = this.getEnvidoChallenge();
-		var trucoChall = this.getTrucoChallenge();
+		var trucoChall = this.getTrucoChallenge(); // Gets the last truco challenge (active)
 
 		var moves = SubTruco.prototype.moves.call(this);
 
@@ -54,18 +54,24 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 			];
 			Array.prototype.push.apply(moves[this.activePlayer()], this.envidoResponses());
 		} else if (this.trucoGoing) {
+			// A _truco_ challenge has been posed and needs to be answered
+
 			moves[this.activePlayer()] = [
 				ChallengedTruco.CHALLENGES.Quiero,
 				ChallengedTruco.CHALLENGES.NoQuiero
 			];
+			// Additionally the player can up the challenge by betting more points
 			Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses());
 		} else {
 			// No challenges are in negotiation. Can raise new ones or play normally
 			if (this.table.length < 2) {
+				// The game is still on its firts round, and _Envido_ challenges can be raised
 				Array.prototype.push.apply(moves[this.activePlayer()], this.envidoResponses());
 			}
 
 			if (!trucoChall || this.canUpChallenge === this.activePlayer()) {
+				// No truco challenges have been made 
+				// OR the current player has `el quiero` (can make further challenges)
 				Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses());
 			}
 		}

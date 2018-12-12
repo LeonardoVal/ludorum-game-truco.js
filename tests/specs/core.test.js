@@ -278,7 +278,11 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 			// El jugador con el quiero puede aumentar la apuesta cantando retruco
 			expect(gameQuerido.activePlayer()).toBe('Foot');
-			expect(gameQuerido.moves().Foot).toEqual([0, 1, 2, chall_retruco]);
+			expect(gameQuerido.moves().Foot).toEqual([0, 1, 2, chall_retruco,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.RealEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
+			]);
 
 
 			// El jugador puede contestar al desafío aumentando la apuesta (cantando retruco sin pasar por el quiero)
