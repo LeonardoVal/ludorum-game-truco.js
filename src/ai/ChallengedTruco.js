@@ -86,7 +86,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		if (sub) {
 			return sub;
 		} else if (this.trucoWinner) {
-			// TODO: Assign score to the challenging player, game over
+			// TODO (reunion): Assign score to the challenging player, game over
 			return this.victory(this.trucoWinner);
 		}
 	},
