@@ -29,7 +29,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 		// _Truco_ related
 		this.trucoStack = [];
-		this.trucoGoing = false; // TODO: Update trucoGoing when a challenge is raised/answered
+		this.trucoGoing = false;
 		this.canUpChallenge = null; // A player that can up the challenge later
 
 		// The player that raised the first challenge in the current chain

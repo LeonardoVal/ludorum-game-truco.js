@@ -249,7 +249,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(game.activePlayer()).toBe('Foot');
 			expect(game.result()).toBeFalsy();
 
-			// TODO: Puede cantarse envido ante de contestar al 'Truco'
+			// TODO(meeting): Confirmar no puede cantarse envido ante de contestar al 'Truco'
 			expect(game.moves().Foot).toEqual([
 				chall_quiero, 
 				chall_noquiero, 
@@ -297,11 +297,9 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(gameRetruco.result()).toBeFalsy();
 			expect(gameRetruco.moves().Hand).toEqual([chall_quiero, chall_noquiero, chall_valecuatro]);
 
-			// TODO: El turno debe volvera  quien inicia la cadena.
-			// e.g. Mano: truco, Pie: retruco (al llegar a un `quiero` será el turno del mano)
 			gameRetruco = gameRetruco.next({'Hand': chall_quiero});
 			expect(gameRetruco.activePlayer()).toBe('Hand'); 
-			// TODO: Esta parida vale 3 puntos
+			// TODO(meeting): Esta parida vale 3 puntos
 			expect(gameRetruco.result()).toBeFalsy();
 			expect(gameRetruco.moves().Hand).toEqual([0, 1, 2,
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
