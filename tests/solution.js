@@ -53,6 +53,6 @@ function addCase(cardsHand, cardsFoot, callback) {
 			LOGGER.info('Processed '+ caseCount +' cases ('+ recordCount +' records).');
 		}
 	});
-	
+
 	LOGGER.info("Finished.");
 })();

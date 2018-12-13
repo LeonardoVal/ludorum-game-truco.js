@@ -192,7 +192,6 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(game2.cardsFoot).toEqual([]);
 			expect(game2.table).toEqual([6, 5, 7, 12, 5, 8]);
 			expect(game2.activePlayer()).toBe('Hand');
-			console.log(game2.result_parcial);
 			expect(game2.result()).toEqual({'Foot': 1, 'Hand': -1});
 		});
 
@@ -273,15 +272,21 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			// El mano no puede aumentar la apuesta del truco y ya no puede cantar envido
 			expect(gameQuerido.activePlayer()).toBe('Hand');
 			expect(gameQuerido.result()).toBeFalsy();
-			expect(gameQuerido.moves().Hand).toEqual([0, 1, 2]);
+			expect(gameQuerido.moves().Hand).toEqual([0, 1, 2,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.RealEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
+			]);
+
 			gameQuerido = gameQuerido.next({'Hand': 0});
 
 			// El jugador con el quiero puede aumentar la apuesta cantando retruco
 			expect(gameQuerido.activePlayer()).toBe('Foot');
-			expect(gameQuerido.moves().Foot).toEqual([0, 1, 2, chall_retruco,
+			expect(gameQuerido.moves().Foot).toEqual([0, 1, 2,
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.RealEnvido,
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
+				chall_retruco,
 			]);
 
 

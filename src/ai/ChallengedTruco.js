@@ -33,6 +33,26 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		this.canUpChallenge = null; // A player that can up the challenge later
 	},
 
+	/** Clones the game to create apparently inmutable progression **/
+	clone: function clone() {
+		var gclone = new this.constructor(
+			this.table.slice(),
+			this.cardsHand.slice(),
+			this.cardsFoot.slice(),
+			this.globalScore);
+
+		gclone.trucoWinner = this.trucoWinner;
+
+		gclone.envidoStack = this.envidoStack.slice();
+		gclone.envidoGoing = this.envidoGoing;
+
+		gclone.trucoStack = this.trucoStack.slice();
+		gclone.trucoGoing = this.trucoGoing;
+		gclone.canUpChallenge = this.canUpChallenge;
+
+		return gclone;
+	},
+
 	/** The players' roles in a ChallengedTruco match are `"Hand"` (_Mano_) and `"Foot"` (_Pie_). */
 	players: ["Hand", "Foot"],
 
@@ -119,8 +139,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 						// in Game.result()?
 					} else if (trucoChall) {
 						that.trucoGoing = false;
-						that.canUpChallenge =
-							trucoChall != ChallengedTruco.CHALLENGES.ValeCuatro ? activePlayer : null;
+						that.canUpChallenge = (trucoChall !== ChallengedTruco.CHALLENGES.ValeCuatro) ? activePlayer : null;
 					} else { /* IMPOSSIBLE */ }
 					break;
 
@@ -158,20 +177,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	},
 
 	// ## Utility methods ##########################################################################
-
-	/** Clones the game to create apparently inmutable progression **/
-	clone: function clone() {
-		var cloned_game = new this.constructor(
-			this.table.slice(),
-			this.cardsHand.slice(),
-			this.cardsFoot.slice(),
-			this.globalScore);
-
-		cloned_game.envidoStack = this.envidoStack.slice();
-		cloned_game.trucoStack = this.trucoStack.slice();
-
-		return cloned_game;
-	},
 
 	/** Calculates the value of the game based on the trucoStack **/
 	trucoStackWorth: function trucoStackWorth() {
