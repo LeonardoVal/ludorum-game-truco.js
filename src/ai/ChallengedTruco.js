@@ -31,6 +31,10 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		this.trucoStack = [];
 		this.trucoGoing = false; // TODO: Update trucoGoing when a challenge is raised/answered
 		this.canUpChallenge = null; // A player that can up the challenge later
+
+		// The player that raised the first challenge in the current chain
+		// Necessary to give the turn to the correct player after a chain of upped challenges
+		this.trucoChallenger = null;
 	},
 
 	/** Clones the game to create apparently inmutable progression **/
@@ -49,6 +53,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		gclone.trucoStack = this.trucoStack.slice();
 		gclone.trucoGoing = this.trucoGoing;
 		gclone.canUpChallenge = this.canUpChallenge;
+
+		gclone.trucoChallenger = this.trucoChallenger;
 
 		return gclone;
 	},
@@ -124,6 +130,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 			return SubTruco.prototype.next.call(this, moves, haps, update);
 		} else {
 			var that = update ? this : this.clone();
+			var nextPlayer = this.opponent();
 			var envidoChallenge = that.getEnvidoChallenge();
 			var trucoChall = that.getTrucoChallenge();
 
@@ -140,6 +147,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					} else if (trucoChall) {
 						that.trucoGoing = false;
 						that.canUpChallenge = (trucoChall !== ChallengedTruco.CHALLENGES.ValeCuatro) ? activePlayer : null;
+						nextPlayer = this.trucoChallenger;
+						that.trucoChallenger = null;
 					} else { /* IMPOSSIBLE */ }
 					break;
 
@@ -159,6 +168,9 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				case ChallengedTruco.CHALLENGES.Truco:
 				case ChallengedTruco.CHALLENGES.ReTruco:
 				case ChallengedTruco.CHALLENGES.ValeCuatro:
+					if (!this.trucoChallenger) {
+						that.trucoChallenger = activePlayer;
+					}
 					that.canUpChallenge = null;
 					that.trucoGoing = true;
 					that.trucoStack.push(move);
@@ -171,7 +183,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					that.envidoStack.push(move);
 					break;
 			}
-			that.activatePlayers(this.opponent());
+			that.activatePlayers(nextPlayer);
 			return that;
 		}
 	},

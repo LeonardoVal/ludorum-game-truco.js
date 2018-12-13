@@ -303,7 +303,12 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(gameRetruco.activePlayer()).toBe('Hand'); 
 			// TODO: Esta parida vale 3 puntos
 			expect(gameRetruco.result()).toBeFalsy();
-			expect(gameRetruco.moves().Hand).toEqual([0, 1, 2, chall_valecuatro]);
+			expect(gameRetruco.moves().Hand).toEqual([0, 1, 2,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.RealEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
+				chall_valecuatro,
+			]);
 		});
 	});
 
