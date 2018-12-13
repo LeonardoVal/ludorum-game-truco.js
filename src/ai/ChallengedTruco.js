@@ -28,8 +28,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		this.envidoGoing = false; // TODO: Update envidoGoing when a challenge is raised/answered
 
 		// _Truco_ related
-		this.trucoStack = [];
-		this.trucoGoing = false;
+		this.trucoState = null;
+		this.trucoPosed = null;
 		this.canUpChallenge = null; // A player that can up the challenge later
 
 		// The player that raised the first challenge in the current chain
@@ -50,8 +50,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		gclone.envidoStack = this.envidoStack.slice();
 		gclone.envidoGoing = this.envidoGoing;
 
-		gclone.trucoStack = this.trucoStack.slice();
-		gclone.trucoGoing = this.trucoGoing;
+		gclone.trucoState = this.trucoState;
+		gclone.trucoPosed = this.trucoPosed;
 		gclone.canUpChallenge = this.canUpChallenge;
 
 		gclone.trucoChallenger = this.trucoChallenger;
@@ -71,7 +71,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	 */
 	moves: function moves() {
 		var envidoChall = this.getEnvidoChallenge();
-		var trucoChall = this.getTrucoChallenge(); // Gets the last truco challenge (active)
 
 		var moves = SubTruco.prototype.moves.call(this);
 
@@ -81,7 +80,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				ChallengedTruco.CHALLENGES.NoQuiero
 			];
 			Array.prototype.push.apply(moves[this.activePlayer()], this.envidoResponses());
-		} else if (this.trucoGoing) {
+		} else if (this.trucoPosed) {
 			// A _truco_ challenge has been posed and needs to be answered
 
 			moves[this.activePlayer()] = [
@@ -89,7 +88,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				ChallengedTruco.CHALLENGES.NoQuiero
 			];
 			// Additionally the player can up the challenge by betting more points
-			Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses());
+			Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses(this.trucoPosed));
 		} else {
 			// No challenges are in negotiation. Can raise new ones or play normally
 			if (this.table.length < 2) {
@@ -97,10 +96,10 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				Array.prototype.push.apply(moves[this.activePlayer()], this.envidoResponses());
 			}
 
-			if (!trucoChall || this.canUpChallenge === this.activePlayer()) {
+			if (!this.trucoState || this.canUpChallenge === this.activePlayer()) {
 				// No truco challenges have been made 
 				// OR the current player has `el quiero` (can make further challenges)
-				Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses());
+				Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses(this.trucoState));
 			}
 		}
 		return moves;
@@ -132,7 +131,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 			var that = update ? this : this.clone();
 			var nextPlayer = this.opponent();
 			var envidoChallenge = that.getEnvidoChallenge();
-			var trucoChall = that.getTrucoChallenge();
 
 			switch (move) {
 				case ChallengedTruco.CHALLENGES.Quiero:
@@ -144,9 +142,10 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 						that.envidoGoing = false;
 						// TODO: (meeting) How are the different ENVIDO scores published
 						// in Game.result()?
-					} else if (trucoChall) {
-						that.trucoGoing = false;
-						that.canUpChallenge = (trucoChall !== ChallengedTruco.CHALLENGES.ValeCuatro) ? activePlayer : null;
+					} else if (this.trucoPosed) {
+						that.trucoState = that.trucoPosed;
+						that.trucoPosed = null;
+						that.canUpChallenge = (this.trucoPosed !== ChallengedTruco.CHALLENGES.ValeCuatro) ? activePlayer : null;
 						nextPlayer = this.trucoChallenger;
 						that.trucoChallenger = null;
 					} else { /* IMPOSSIBLE */ }
@@ -157,8 +156,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 						that.envidoGoing = false;
 						var envidoNotWantedPoints = that.envidoStackWorth()[1];
 						// TODO: Assign score to the challenging player, game continues
-					} else if (trucoChall) {
-						that.trucoGoing = false;
+					} else if (this.trucoPosed) {
+						that.trucoPosed = null;
 						var challengerScore = that.trucoStackWorth() - 1;
 						var op = this.opponent();
 						that.trucoWinner = op;
@@ -171,9 +170,11 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					if (!this.trucoChallenger) {
 						that.trucoChallenger = activePlayer;
 					}
+					if (that.trucoPosed) {
+						that.trucoState = that.trucoPosed;
+					}
 					that.canUpChallenge = null;
-					that.trucoGoing = true;
-					that.trucoStack.push(move);
+					that.trucoPosed = move;
 					break;
 
 				case ChallengedTruco.CHALLENGES.Envido:
@@ -192,7 +193,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 	/** Calculates the value of the game based on the trucoStack **/
 	trucoStackWorth: function trucoStackWorth() {
-		return this.trucoStack.length + 1;
+		return this.trucoState - 1;
 		// Truco: 2
 		// Truco, ReTruco: 3
 		// TRUCO; ReTruco, ValeCuatro: 4
@@ -200,10 +201,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 	getEnvidoChallenge: function() {
 		return this.envidoStack[this.envidoStack.length - 1];
-	},
-
-	getTrucoChallenge: function() {
-		return this.trucoStack[this.trucoStack.length - 1];
 	},
 
 	/**
@@ -270,10 +267,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		return possibleMoves;
 	},
 
-	trucoResponses: function trucoResponses() {
-		var trucoChall = this.getTrucoChallenge();
-
-		switch (trucoChall) {
+	trucoResponses: function trucoResponses(chall) {
+		switch (chall) {
 			case ChallengedTruco.CHALLENGES.Truco:
 				return [ChallengedTruco.CHALLENGES.ReTruco];
 			case ChallengedTruco.CHALLENGES.ReTruco:
