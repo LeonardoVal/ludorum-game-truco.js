@@ -307,6 +307,34 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
 				chall_valecuatro,
 			]);
+
+			gameRetruco = gameRetruco.next({'Hand': 0});
+			expect(gameRetruco.activePlayer()).toBe('Foot');
+			expect(gameRetruco.result()).toBeFalsy();
+			expect(gameRetruco.moves().Foot).toEqual([0, 1, 2,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.FaltaEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.RealEnvido,
+				ludorum_game_truco.ai.ChallengedTruco.CHALLENGES.Envido,
+			]);
+
+			gameRetruco = gameRetruco.next({'Foot': 1});
+			expect(gameRetruco.activePlayer()).toBe('Hand');
+			expect(gameRetruco.result()).toBeFalsy();
+			expect(gameRetruco.moves().Hand).toEqual([0, 1, chall_valecuatro]);
+
+			gameRetruco = gameRetruco.next({'Hand': chall_valecuatro});
+			expect(gameRetruco.activePlayer()).toBe('Foot');
+			expect(gameRetruco.result()).toBeFalsy();
+			expect(gameRetruco.moves().Foot).toEqual([chall_quiero, chall_noquiero]);
+
+			var gameValeCuatroNoQuiero = gameRetruco.next({'Foot': chall_noquiero});
+			// TODO(meeting): Consider game score on result();
+			expect(gameValeCuatroNoQuiero.result()).toEqual({'Foot': -1, 'Hand': 1});
+
+			var gameValeCuatroQuiero = gameRetruco.next({'Foot': chall_quiero});
+			expect(gameValeCuatroQuiero.activePlayer()).toBe('Hand');
+			expect(gameValeCuatroQuiero.result()).toBeFalsy();
+			expect(gameValeCuatroQuiero.moves().Hand).toEqual([0, 1]);
 		});
 	});
 

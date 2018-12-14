@@ -273,6 +273,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				return [ChallengedTruco.CHALLENGES.ReTruco];
 			case ChallengedTruco.CHALLENGES.ReTruco:
 				return [ChallengedTruco.CHALLENGES.ValeCuatro];
+			case ChallengedTruco.CHALLENGES.ValeCuatro:
+				return [];
 			default:
 				return [ChallengedTruco.CHALLENGES.Truco];
 		}
