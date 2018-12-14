@@ -108,11 +108,15 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	/** Gives the result of the game */
 	result: function result() {
 		var sub = SubTruco.prototype.result.call(this);
+		var r = {};
 		if (sub) {
-			return sub;
+			r[this.players[0]] = sub[this.players[0]] * this.trucoStackWorth();
+			r[this.players[1]] = sub[this.players[1]] * this.trucoStackWorth();
+			return r;
 		} else if (this.trucoWinner) {
-			// TODO (reunion): Assign score to the challenging player, game over
-			return this.victory(this.trucoWinner);
+			r[this.trucoWinner] = this.trucoStackWorth();
+			r[this.trucoWinner === 'Hand' ? 'Foot' : 'Hand'] = -r[this.trucoWinner];
+			return r;
 		}
 	},
 
@@ -158,7 +162,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 						// TODO: Assign score to the challenging player, game continues
 					} else if (this.trucoPosed) {
 						that.trucoPosed = null;
-						var challengerScore = that.trucoStackWorth() - 1;
 						var op = this.opponent();
 						that.trucoWinner = op;
 					} else { /* IMPOSSIBLE */ }
@@ -193,7 +196,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 	/** Calculates the value of the game based on the trucoStack **/
 	trucoStackWorth: function trucoStackWorth() {
-		return this.trucoState - 1;
+		return (this.trucoState ? this.trucoState - 1 : 1);
 		// Truco: 2
 		// Truco, ReTruco: 3
 		// TRUCO; ReTruco, ValeCuatro: 4

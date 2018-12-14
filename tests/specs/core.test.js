@@ -10,30 +10,31 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 	}); //// describe "ludorum-game-truco"
 
-	describe("ludorum-game-subtruco", function() {
-		function theWinnerIs(hand, foot, winner) {
-			var winnerIsGame = new ludorum_game_truco.ai.SubTruco([], hand, foot);
+	function winnerWithScore(game, handScore) {
+		var winnerIsGame = game;
 
+		winnerIsGame = winnerIsGame.next({'Hand': 0});
+		winnerIsGame = winnerIsGame.next({'Foot': 0});
+
+		if (!winnerIsGame.result()) {
 			winnerIsGame = winnerIsGame.next({'Hand': 0});
 			winnerIsGame = winnerIsGame.next({'Foot': 0});
-
-			if (!winnerIsGame.result()) {
-				winnerIsGame = winnerIsGame.next({'Hand': 0});
-				winnerIsGame = winnerIsGame.next({'Foot': 0});
-			}
-
-
-			if (!winnerIsGame.result()) {
-				winnerIsGame = winnerIsGame.next({'Hand': 0});
-				winnerIsGame = winnerIsGame.next({'Foot': 0});
-			}
-
-			if (winner === 'Hand') {
-				expect(winnerIsGame.result()).toEqual({'Foot': -1, 'Hand': 1});
-			} else {
-				expect(winnerIsGame.result()).toEqual({'Foot': 1, 'Hand': -1});
-			}
 		}
+
+
+		if (!winnerIsGame.result()) {
+			winnerIsGame = winnerIsGame.next({'Hand': 0});
+			winnerIsGame = winnerIsGame.next({'Foot': 0});
+		}
+
+		expect(winnerIsGame.result()).toEqual({'Foot': -handScore, 'Hand': handScore});
+	}
+	function theWinnerIs(hand, foot, winner) {
+		var winnerIsGame = new ludorum_game_truco.ai.SubTruco([], hand, foot);
+
+		winnerWithScore(winnerIsGame, winner === 'Hand' ? 1 : -1);
+	}
+	describe("ludorum-game-subtruco", function() {
 
 		it("calculates possible moves", function () {
 			console.log("Started it calculates possible moves");
@@ -328,13 +329,30 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(gameRetruco.moves().Foot).toEqual([chall_quiero, chall_noquiero]);
 
 			var gameValeCuatroNoQuiero = gameRetruco.next({'Foot': chall_noquiero});
-			// TODO(meeting): Consider game score on result();
-			expect(gameValeCuatroNoQuiero.result()).toEqual({'Foot': -1, 'Hand': 1});
+			expect(gameValeCuatroNoQuiero.result()).toEqual({'Foot': -3, 'Hand': 3});
 
 			var gameValeCuatroQuiero = gameRetruco.next({'Foot': chall_quiero});
 			expect(gameValeCuatroQuiero.activePlayer()).toBe('Hand');
 			expect(gameValeCuatroQuiero.result()).toBeFalsy();
 			expect(gameValeCuatroQuiero.moves().Hand).toEqual([0, 1]);
+		});
+
+		it("ends with a score reflecting raised challenges", function() {
+			var game = new ludorum_game_truco.ai.ChallengedTruco([], [12, 5, 8], [6, 7, 5]);
+			game = game.next({'Hand': chall_truco});
+			expect(game.next({'Foot': chall_noquiero}).result()).toEqual({'Foot': -1, 'Hand': 1});
+
+			winnerWithScore(game.next({'Foot': chall_quiero}), 2);
+
+			game = game.next({'Foot': chall_retruco});
+			expect(game.next({'Hand': chall_noquiero}).result()).toEqual({'Foot': 2, 'Hand': -2});
+
+			winnerWithScore(game.next({'Hand': chall_quiero}), 3);
+
+			game = game.next({'Hand': chall_valecuatro});
+			expect(game.next({'Foot': chall_noquiero}).result()).toEqual({'Foot': -3, 'Hand': 3});
+
+			winnerWithScore(game.next({'Foot': chall_quiero}), 4);
 		});
 	});
 
