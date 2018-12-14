@@ -100,9 +100,9 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	the _Foot_ player, both encoded in the same way as the cards on the table.
 	*/
 	identifier: function identifier() {
-		var toChar = (n) => (n - 1).toString(36);
-		return this.table.length + this.table.map(toChar).join('') +
-			this.cardsHand.map(toChar).join('') +
+		var toChar = (n) => n.toString(36);
+		return this.table.length + this.table.map(toChar).join('') + 
+			this.cardsHand.map(toChar).join('') + 
 			this.cardsFoot.map(toChar).join('');
 	},
 
@@ -136,7 +136,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	*/
 	'static enumerateCards': function enumerateCards() {
 		var It = base.Iterable,
-			baseSequence = It.product.apply(It, It.repeat(It.range(1,14), 6).toArray());
+			baseSequence = It.product.apply(It, It.repeat(It.range(1,15), 6).toArray());
 		return baseSequence.filter(function (cards) {
 			cards = cards.map((n) => n.toString(36));
 			var cardsHand = cards.slice(0, 3),
