@@ -1,6 +1,7 @@
 require(['require-config'], function (init) { "use strict";
 init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'], function (ludorum, base, Sermat, PlayTesterApp, ludorum_game_truco) {
-	var CheckerboardFromString = ludorum.utils.CheckerboardFromString;
+	var CheckerboardFromString = ludorum.utils.CheckerboardFromString,
+	    CARDS = ludorum_game_truco.ai.SubTruco.CARDS;
 
 	/** Custom HTML interface for TicTacToe.
 	*/
@@ -51,25 +52,26 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 					switch (data.coord[0]) {
 						case row.tableH:
 							// Shows hand's cards on table
-							data.innerHTML = table[data.coord[1] * 2 ] || '&nbsp;';
+							data.card = table[data.coord[1] * 2 ] || 0;
 							data.className = classNames.table;
 							break;
 						case row.tableF:
 							// Shows foots's cards on table
-							data.innerHTML = table[data.coord[1] * 2 + 1] || '&nbsp;';
+							data.card = table[data.coord[1] * 2 + 1] || 0;
 							data.className = classNames.table;
 							break;
 						case row.hand:
-							data.innerHTML = cardsHand[data.coord[1]] || '&nbsp;';
+							data.card = cardsHand[data.coord[1]] || 0;
 							data.className = classNames.player;
 							break;
 						case row.foot:
-							data.innerHTML = cardsFoot[data.coord[1]] || '&nbsp;';
+							data.card = cardsFoot[data.coord[1]] || 0;
 							data.className = classNames.player;
 							break;
 						default:
 							break;
 					}
+					data.innerHTML = CARDS[data.card][0] || '&nbsp;';
 					if (moves) {
 						if ((data.coord[0] === row.hand && activePlayer === 'Hand') || (data.coord[0] === row.foot && activePlayer === 'Foot')) {
 							data.className = classNames.active;

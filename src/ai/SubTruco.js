@@ -13,6 +13,7 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	*/
 	constructor: function SubTruco(table, cardsHand, cardsFoot) {
 		Game.call(this, this.players[table.length % 2]);
+		// TODO: What numbers are passed? A card from 0 to 39?
 		this.table = table;
 		this.cardsHand = cardsHand;
 		this.cardsFoot = cardsFoot;
