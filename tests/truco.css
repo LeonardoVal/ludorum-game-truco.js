@@ -65,10 +65,10 @@ footer {
 }
 #board table td {
 	border: 2px solid black;
-	font-size: 4em;
+	font-size: 2em;
 	font-family: "Comic Sans MS", cursive, sans-serif;
 	width: 32%;
-	height: 32%;
+	height: 25%;
 	text-align: center;
 }
 #board table tr:first-child td {
@@ -82,4 +82,12 @@ footer {
 }
 #board table tr td:last-child {
 	border-right: 0;
+}
+
+#board .activeCard {
+	background-color: #7ceb91;
+}
+
+#board .table {
+	background-color: #ffd280;
 }
