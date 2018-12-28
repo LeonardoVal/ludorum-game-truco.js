@@ -11,12 +11,17 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	+ `cardsHand`: An array with the cards on the first player's hand,
 	+ `cardsFoot`: An array with the cards on the second player's hand.
 	*/
-	constructor: function SubTruco(table, cardsHand, cardsFoot) {
+	constructor: function SubTruco(table, cardsHand, cardsFoot, realTable, realHand, realFoot) {
 		Game.call(this, this.players[table.length % 2]);
-		// TODO: What numbers are passed? A card from 0 to 39?
+
 		this.table = table;
 		this.cardsHand = cardsHand;
 		this.cardsFoot = cardsFoot;
+
+		this.realTable = realTable || [];
+		this.realHand = realHand || [];
+		this.realFoot = realFoot || [];
+		this.__realCards__();
 	},
 
 	/** The players' roles in a Truco match are `"Hand"` (_Mano_) and `"Foot"` (_Pie_).
@@ -45,6 +50,37 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 			r.push(Math.sign(this.table[i] - this.table[i+1]));
 		}
 		return r;
+	},
+
+	/**
+	 * Converts cards from 1-14 space to 1-40.
+	 */
+	__realCards__: function __realCards__() {
+		if (this.realFoot.length !== 0 || this.realTable.length !== 0) {
+			return;
+		}
+		var p = (n) => {
+			var ix;
+			if (n <= 0) {
+				ix = 0;
+			} else if (n <= 4) {
+				ix = (n - 1) * 4 + 1;
+			} else if (n <= 7) {
+				ix = (n - 1) * 4 - 1;
+			} else if (n === 8) {
+				ix = 27;
+			} else if (n <= 11) {
+				ix = (n - 2) * 4 + 1;
+			} else if (n <= 14) {
+				ix = n + 26;
+			} else {
+				ix = 0;
+			}
+			return SubTruco.CARDS[ix];
+		};
+		this.realTable = this.table.map(p);
+		this.realHand = this.cardsHand.map(p);
+		this.realFoot = this.cardsFoot.map(p);
 	},
 
 	/** The round may end when both players have played two cards, if one player wins both card
@@ -80,10 +116,13 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		var that = update ? this : this.clone(),
 			activePlayer = this.activePlayer(),
 			move = +moves[activePlayer],
+			real = that['real'+ activePlayer],
 			cards = that['cards'+ activePlayer];
 		base.raiseIf(move < 0 || move >= cards.length, 'Invalid move ', move, 'at', that, '!');
 		that.table.push(cards[move]);
 		cards.splice(move, 1);
+		that.realTable.push(real[move]);
+		real.splice(move, 1);
 		that.activatePlayers(this.opponent());
 		return that;
 	},
@@ -92,7 +131,8 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 
 	clone: function clone() {
 		return new this.constructor(this.table.slice(), this.cardsHand.slice(),
-			this.cardsFoot.slice());
+			this.cardsFoot.slice(), this.realTable.slice(), this.realHand.slice(),
+			this.realFoot.slice());
 	},
 
 	/** The string `identifier` for a `SubTruco` state always has 7 characters. The first one
@@ -114,21 +154,21 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 	golds and hearts for cups.
 	*/
 	'static CARDS': [
-		[],                    //  0: Invalid.
-		['4♦','4♥','4♠','4♣'], //  1: All fours.
-		['5♦','5♥','5♠','5♣'], //  2: All fives.
-		['6♦','6♥','6♠','6♣'], //  3: All sixes.
-		['7♥','7♣'],           //  4: Sevens of hearts (cups) and clubs.
-		['A♦','A♥','A♠','A♣'], //  5: All jacks (10s).
-		['B♦','B♥','B♠','B♣'], //  6: All knights (11s).
-		['C♦','C♥','C♠','C♣'], //  7: All kings (12s).
-		['1♦','1♥'],           //  8: Aces of diamonds (golds) and hearts (cups).
-		['2♦','2♥','2♠','2♣'], //  9: All twos.
-		['3♦','3♥','3♠','3♣'], // 10: All threes.
-		['7♦'],                // 11: Seven of diamonds (golds).
-		['7♠'],                // 12: Seven of spades.
-		['1♣'],                // 13: Ace of clubs.
-		['1♠']                 // 14: Ace of spades.
+		null,                    //  0: Invalid.
+		'4♦','4♥','4♠','4♣', //  1: All fours.
+		'5♦','5♥','5♠','5♣', //  2: All fives.
+		'6♦','6♥','6♠','6♣', //  3: All sixes.
+		'7♥','7♣',           //  4: Sevens of hearts (cups) and clubs.
+		'A♦','A♥','A♠','A♣', //  5: All jacks (10s).
+		'B♦','B♥','B♠','B♣', //  6: All knights (11s).
+		'C♦','C♥','C♠','C♣', //  7: All kings (12s).
+		'1♦','1♥',           //  8: Aces of diamonds (golds) and hearts (cups).
+		'2♦','2♥','2♠','2♣', //  9: All twos.
+		'3♦','3♥','3♠','3♣', // 10: All threes.
+		'7♦',                // 11: Seven of diamonds (golds).
+		'7♠',                // 12: Seven of spades.
+		'1♣',                // 13: Ace of clubs.
+		'1♠'                 // 14: Ace of spades.
 	],
 
 	/** The `enumerateCards` function returns an iterable of all possible hands for `SubTruco`. The

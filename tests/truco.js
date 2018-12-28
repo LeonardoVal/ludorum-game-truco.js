@@ -39,9 +39,9 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 			var ui = this,
 				activePlayer = game.activePlayer(),
 				moves = game.moves(),
-				table = game.table,
-				cardsHand = game.cardsHand,
-				cardsFoot = game.cardsFoot,
+				table = game.realTable,
+				cardsHand = game.realHand,
+				cardsFoot = game.realFoot,
 				classNames = this.classNames,
 				row = this.uiRow,
 				squareHTML = this.squareHTML;
@@ -71,7 +71,7 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 						default:
 							break;
 					}
-					data.innerHTML = CARDS[data.card][0] || '&nbsp;';
+					data.innerHTML = data.card || '&nbsp;';
 					if (moves) {
 						if ((data.coord[0] === row.hand && activePlayer === 'Hand') || (data.coord[0] === row.foot && activePlayer === 'Foot')) {
 							data.className = classNames.active;
