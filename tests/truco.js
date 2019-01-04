@@ -85,7 +85,7 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 	});
 
 	/** PlayTesterApp initialization. ************************************************************/
-	var APP = new PlayTesterApp(new ludorum_game_truco.ai.SubTruco([], [2, 4, 6], [1, 3, 5]), new TrucoHTMLInterface(),
+	var APP = new PlayTesterApp(new ludorum_game_truco.ai.ChallengedTruco([], [2, 4, 6], [1, 3, 5]), new TrucoHTMLInterface(),
 		{ bar: document.getElementsByTagName('footer')[0] });
 	base.global.APP = APP;
 	APP.playerUI("You")

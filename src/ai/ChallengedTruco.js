@@ -97,7 +97,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 			}
 
 			if (!this.trucoState || this.canUpChallenge === this.activePlayer()) {
-				// No truco challenges have been made 
+				// No truco challenges have been made
 				// OR the current player has `el quiero` (can make further challenges)
 				Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses(this.trucoState));
 			}
