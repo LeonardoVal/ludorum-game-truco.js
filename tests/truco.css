@@ -88,6 +88,11 @@ footer {
 	background-color: #7ceb91;
 }
 
+#board .challenge {
+	font-family: monospace;
+	font-weight: bold;
+}
+
 #board .table {
 	background-color: #ffd280;
 }

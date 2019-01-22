@@ -20,8 +20,8 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 			'active': "activeCard",
 			'table': 'table',
 			'player': 'player',
-			'challenge': 'activeCard',
-			'nochall': '',
+			'challenge': 'activeCard challenge',
+			'nochall': 'challenge',
 		},
 
 		uiRow: {
@@ -50,6 +50,7 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 				return;
 			}
 			data.innerHTML = symbol;
+			data.className = classNames.nochall;
 			if (moveList.includes(move)) {
 				data.className = classNames.challenge;
 				data.move = move;
