@@ -45,6 +45,19 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 			console.log(moves);
 			console.log(CHALLENGES);
 
+		function challMove(row, column, data, moveList, move, symbol) {
+			if (data.coord[0] !== row || data.coord[1] !== column) {
+				return;
+			}
+			data.innerHTML = symbol;
+			if (moveList.includes(move)) {
+				data.className = classNames.challenge;
+				data.move = move;
+				data.activePlayer = activePlayer;
+				data.onclick = ui.perform.bind(ui, data.move, activePlayer);
+			}
+		}
+
 			moves = moves && moves[activePlayer] && moves[activePlayer].length > 0;
 			(new CheckerboardFromString(4, 5))
 				.renderAsHTMLTable(ui.document, ui.container, function (data) {
@@ -82,50 +95,18 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 							}
 						}
 					} else {
-						switch (data.coord[0]) {
-							case 3:
-								switch (data.coord[1]) {
-									case 3:
-										data.innerHTML = 'Qu';
-										data.className = classNames.challenge;
-										break;
-									case 4:
-										data.innerHTML = 'NQ';
-										data.className = classNames.challenge;
-										break;
-								}
-								break;
-							case 2:
-								switch (data.coord[1]) {
-									case 3:
-										data.innerHTML = 'Tr';
-										data.className = classNames.challenge;
-										break;
-									case 4:
-										data.innerHTML = 'RT';
-										data.className = classNames.challenge;
-										break;
-								}
-								break;
-							case 1:
-								switch (data.coord[1]) {
-									case 3:
-										data.innerHTML = 'V4';
-										data.className = classNames.challenge;
-										break;
-									default:
-										data.innerHTML = '&nbsp;';
-										break;
-								}
-								break;
-							default:
-								data.innerHTML = '&nbsp;';
-								break;
-						}
+						data.innerHTML = '&nbsp;';
+						var moveList = game.moves()[activePlayer];
+						challMove(3, 3, data, moveList, CHALLENGES.Quiero, 'Qu');
+						challMove(3, 4, data, moveList, CHALLENGES.NoQuiero, 'NQ');
+						challMove(2, 3, data, moveList, CHALLENGES.Truco, 'Tr');
+						challMove(2, 4, data, moveList, CHALLENGES.ReTruco, 'RT');
+						challMove(1, 3, data, moveList, CHALLENGES.ValeCuatro, 'V4');
 					}
 				});
 		}
 	});
+
 
 	/** PlayTesterApp initialization. ************************************************************/
 	var APP = new PlayTesterApp(new ludorum_game_truco.ai.ChallengedTruco([], [2, 4, 6], [1, 3, 5]), new TrucoHTMLInterface(),
