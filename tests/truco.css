@@ -48,14 +48,6 @@ footer {
 	color: white;
 }
 
-/* Challenges board *****************************************************************/
-#challenges {
-	width: 15em;
-	height: 15em;
-	border-collapse: collapse;
-	float: left;
-}
-
 /* Game board *****************************************************************/
 #board table {
 	border-collapse: collapse;
@@ -75,7 +67,7 @@ footer {
 	border: 2px solid black;
 	font-size: 2em;
 	font-family: "Comic Sans MS", cursive, sans-serif;
-	width: 32%;
+	width: 20%;
 	height: 25%;
 	text-align: center;
 }
