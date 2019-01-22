@@ -20,14 +20,6 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 			'player': 'player',
 		},
 
-		/** This is a mapping from the board to HTML for each of the board's squares.
-		*/
-		squareHTML: {
-			'X': "X",
-			'O': "O",
-			'_': "&nbsp;"
-		},
-
 		uiRow: {
 			'hand': 3,
 			'foot': 0,
@@ -90,7 +82,7 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 	base.global.APP = APP;
 	APP.playerUI("You")
 		.playerRandom()
-		.selects(['playerXs', 'playerOs'])
+		.selects(['playerHand', 'playerFoot'])
 		.button('resetButton', document.getElementById('reset'), APP.reset.bind(APP))
 		.reset();
 

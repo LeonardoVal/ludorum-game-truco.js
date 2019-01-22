@@ -72,7 +72,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	moves: function moves() {
 		var envidoChall = this.getEnvidoChallenge();
 
-		var moves = SubTruco.prototype.moves.call(this);
+		var moves = SubTruco.prototype.moves.call(this) || {'Hand': [], 'Foot': []};
 
 		if (this.envidoGoing) {
 			moves[this.activePlayer()] = [
