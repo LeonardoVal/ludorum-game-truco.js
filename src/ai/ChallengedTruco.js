@@ -73,7 +73,6 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		if (this.result()) {
 			return null;
 		}
-		var envidoChall = this.getEnvidoChallenge();
 
 		var moves = SubTruco.prototype.moves.call(this) || {'Hand': [], 'Foot': []};
 
