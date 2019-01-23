@@ -97,7 +97,7 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 						}
 					} else {
 						data.innerHTML = '&nbsp;';
-						var moveList = game.moves()[activePlayer];
+						var moveList = (game.moves() && game.moves()[activePlayer]) || [];
 						challMove(3, 3, data, moveList, CHALLENGES.Quiero, 'Qu');
 						challMove(3, 4, data, moveList, CHALLENGES.NoQuiero, 'NQ');
 						challMove(2, 3, data, moveList, CHALLENGES.Truco, 'Tr');
