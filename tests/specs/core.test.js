@@ -28,6 +28,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 		}
 
 		expect(winnerIsGame.result()).toEqual({'Foot': -handScore, 'Hand': handScore});
+		expect(winnerIsGame.moves()).toEqual(null);
 	}
 	function theWinnerIs(hand, foot, winner) {
 		var winnerIsGame = new ludorum_game_truco.ai.SubTruco([], hand, foot);
@@ -261,6 +262,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			// Caso el pie rechace el desafio la partida termina
 			gameNoQuerido = game.next({'Foot': chall_noquiero});
 			expect(gameNoQuerido.result()).toEqual({'Foot': -1, 'Hand': 1});
+			expect(gameNoQuerido.moves()).toEqual(null);
 
 
 			// De querer el truco el juego sigue pero solo el pie (quien aceptó)
@@ -330,6 +332,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 			var gameValeCuatroNoQuiero = gameRetruco.next({'Foot': chall_noquiero});
 			expect(gameValeCuatroNoQuiero.result()).toEqual({'Foot': -3, 'Hand': 3});
+			expect(gameValeCuatroNoQuiero.moves()).toEqual(null);
 
 			var gameValeCuatroQuiero = gameRetruco.next({'Foot': chall_quiero});
 			expect(gameValeCuatroQuiero.activePlayer()).toBe('Hand');
@@ -341,16 +344,19 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			var game = new ludorum_game_truco.ai.ChallengedTruco([], [12, 5, 8], [6, 7, 5]);
 			game = game.next({'Hand': chall_truco});
 			expect(game.next({'Foot': chall_noquiero}).result()).toEqual({'Foot': -1, 'Hand': 1});
+			expect(game.next({'Foot': chall_noquiero}).moves()).toEqual(null);
 
 			winnerWithScore(game.next({'Foot': chall_quiero}), 2);
 
 			game = game.next({'Foot': chall_retruco});
 			expect(game.next({'Hand': chall_noquiero}).result()).toEqual({'Foot': 2, 'Hand': -2});
+			expect(game.next({'Hand': chall_noquiero}).moves()).toEqual(null);
 
 			winnerWithScore(game.next({'Hand': chall_quiero}), 3);
 
 			game = game.next({'Hand': chall_valecuatro});
 			expect(game.next({'Foot': chall_noquiero}).result()).toEqual({'Foot': -3, 'Hand': 3});
+			expect(game.next({'Foot': chall_noquiero}).moves()).toEqual(null);
 
 			winnerWithScore(game.next({'Foot': chall_quiero}), 4);
 		});
