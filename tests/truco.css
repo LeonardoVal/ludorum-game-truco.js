@@ -65,7 +65,7 @@ footer {
 /* Game board *****************************************************************/
 #board table {
 	border-collapse: collapse;
-	width: 20em;
+	width: 25em;
 	height: 20em;
 	/*margin: auto;*/
 /*BEGIN user-select: none */
@@ -81,7 +81,7 @@ footer {
 	border: 2px solid black;
 	font-size: 2.3em;
 	font-family: "Comic Sans MS", cursive, sans-serif;
-	width: 20%;
+	width: 16%;
 	height: 25%;
 	text-align: center;
 }
@@ -105,6 +105,15 @@ footer {
 #board .challenge {
 	font-family: monospace;
 	font-weight: bold;
+}
+
+#board .state {
+	background-color: #53ffed;
+	font-size: 2em;
+}
+
+#board .tag {
+	font-size: 0.5em;
 }
 
 #board .table {

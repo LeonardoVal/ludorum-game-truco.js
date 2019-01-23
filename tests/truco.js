@@ -17,11 +17,12 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 		/** Each of the board's squares looks are customized via CSS,
 		*/
 		classNames: {
-			'active': "activeCard",
+			'active': 'activeCard',
 			'table': 'table',
 			'player': 'player',
 			'challenge': 'activeCard challenge',
 			'nochall': 'challenge',
+			'state': 'state challenge',
 		},
 
 		uiRow: {
@@ -60,7 +61,7 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 		}
 
 			moves = moves && moves[activePlayer] && moves[activePlayer].length > 0;
-			(new CheckerboardFromString(4, 5))
+			(new CheckerboardFromString(4, 6))
 				.renderAsHTMLTable(ui.document, ui.container, function (data) {
 					if (data.coord[1] < 3) {
 						switch (data.coord[0]) {
@@ -95,7 +96,7 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 								data.onclick = ui.perform.bind(ui, data.move, activePlayer);
 							}
 						}
-					} else {
+					} else if (data.coord[1] < 5) {
 						data.innerHTML = '&nbsp;';
 						var moveList = (game.moves() && game.moves()[activePlayer]) || [];
 						challMove(3, 3, data, moveList, CHALLENGES.Quiero, 'Qu');
@@ -103,10 +104,35 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 						challMove(2, 3, data, moveList, CHALLENGES.Truco, 'Tr');
 						challMove(2, 4, data, moveList, CHALLENGES.ReTruco, 'RT');
 						challMove(1, 3, data, moveList, CHALLENGES.ValeCuatro, 'V4');
+					} else {
+						data.innerHTML = '&nbsp;';
+						switch (data.coord[0]) {
+							case 3:
+								data.innerHTML = '<span class="tag">State:</span><br/>' + trucoToState(game.trucoState);
+								data.className = classNames.state;
+								break;
+							case 2:
+								data.innerHTML = '<span class="tag">Posed:</span><br/>' + trucoToState(game.trucoPosed);
+								data.className = classNames.state;
+								break;
+						}
 					}
 				});
 		}
 	});
+
+	function trucoToState(challenge) {
+		switch (challenge) {
+			case CHALLENGES.Truco:
+				return 'Tr';
+			case CHALLENGES.ReTruco:
+				return 'RT';
+			case CHALLENGES.ValeCuatro:
+				return 'V4';
+			default:
+				return '&nbsp;';
+		}
+	}
 
 
 	/** PlayTesterApp initialization. ************************************************************/
