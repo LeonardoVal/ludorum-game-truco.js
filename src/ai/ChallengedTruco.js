@@ -70,6 +70,9 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	 * accepting said challenge, or in  some cases upping the bet.
 	 */
 	moves: function moves() {
+		if (this.result()) {
+			return null;
+		}
 		var envidoChall = this.getEnvidoChallenge();
 
 		var moves = SubTruco.prototype.moves.call(this) || {'Hand': [], 'Foot': []};
