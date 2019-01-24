@@ -274,7 +274,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(gameQuerido.cardsFoot).toEqual([1, 3, 5]);
 			expect(gameQuerido.table).toEqual([]);
 
-			// El mano no puede aumentar la apuesta del truco y ya no puede cantar envido
+			// El mano no puede aumentar la apuesta del truco
 			expect(gameQuerido.activePlayer()).toBe('Hand');
 			expect(gameQuerido.result()).toBeFalsy();
 			expect(gameQuerido.moves().Hand).toEqual([0, 1, 2,
@@ -294,6 +294,7 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 				chall_retruco,
 			]);
 
+			expect(gameQuerido.next({'Foot': 0}).moves().Hand).toEqual([0, 1]);
 
 			// El jugador puede contestar al desafío aumentando la apuesta (cantando retruco sin pasar por el quiero)
 			// En este caso el mano debe contestar al desafío.
@@ -304,7 +305,6 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 			gameRetruco = gameRetruco.next({'Hand': chall_quiero});
 			expect(gameRetruco.activePlayer()).toBe('Hand'); 
-			// TODO(meeting): Esta parida vale 3 puntos
 			expect(gameRetruco.result()).toBeFalsy();
 			expect(gameRetruco.moves().Hand).toEqual([0, 1, 2,
 				chall_faltaenvido,
@@ -361,6 +361,124 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(game.next({'Foot': chall_noquiero}).moves()).toEqual(null);
 
 			winnerWithScore(game.next({'Foot': chall_quiero}), 4);
+		});
+
+		it("answers to envido challenges correctly", function() {
+			var game = new ludorum_game_truco.ai.ChallengedTruco([], [12, 5, 8], [6, 7, 5]);
+
+			expect(game.cardsHand).toEqual([12, 5, 8]);
+			expect(game.cardsFoot).toEqual([6, 7, 5]);
+			expect(game.table).toEqual([]);
+			expect(game.activePlayer()).toBe('Hand');
+			expect(game.result()).toBeFalsy();
+			expect(game.moves().Hand).toEqual([0, 1, 2,
+				chall_faltaenvido,
+				chall_realenvido,
+				chall_envido,
+				chall_truco,
+			]);
+
+			var gameEnvido = game.next({'Hand': chall_envido});
+			expect(gameEnvido.cardsHand).toEqual([12, 5, 8]);
+			expect(gameEnvido.cardsFoot).toEqual([6, 7, 5]);
+			expect(gameEnvido.table).toEqual([]);
+			expect(gameEnvido.activePlayer()).toBe('Foot');
+			expect(gameEnvido.result()).toBeFalsy();
+			expect(gameEnvido.moves().Foot).toEqual([
+				chall_quiero,
+				chall_noquiero,
+				chall_faltaenvido,
+				chall_realenvido,
+				chall_envido
+			]);
+
+			var gameEnvidoEnvido = gameEnvido.next({'Foot': chall_envido});
+			expect(gameEnvidoEnvido.activePlayer()).toBe('Hand');
+			expect(gameEnvidoEnvido.result()).toBeFalsy();
+			expect(gameEnvidoEnvido.moves().Hand).toEqual([
+				chall_quiero,
+				chall_noquiero,
+				chall_faltaenvido,
+				chall_realenvido,
+			]);
+
+			var gameEnvidoEnvidoReal = gameEnvidoEnvido.next({'Hand': chall_realenvido});
+			expect(gameEnvidoEnvidoReal.activePlayer()).toBe('Foot');
+			expect(gameEnvidoEnvidoReal.result()).toBeFalsy();
+			expect(gameEnvidoEnvidoReal.moves().Foot).toEqual([
+				chall_quiero,
+				chall_noquiero,
+				chall_faltaenvido
+			]);
+
+			var gameEnvidoEnvidoRealFalta = gameEnvidoEnvidoReal.next({'Foot': chall_faltaenvido});
+			expect(gameEnvidoEnvidoRealFalta.activePlayer()).toBe('Hand');
+			expect(gameEnvidoEnvidoRealFalta.result()).toBeFalsy();
+			expect(gameEnvidoEnvidoRealFalta.moves().Hand).toEqual([
+				chall_quiero,
+				chall_noquiero,
+			]);
+
+			var gameEnvidoEnvidoFalta = gameEnvidoEnvido.next({'Hand': chall_faltaenvido});
+			expect(gameEnvidoEnvidoFalta.activePlayer()).toBe('Foot');
+			expect(gameEnvidoEnvidoFalta.result()).toBeFalsy();
+			expect(gameEnvidoEnvidoFalta.moves().Foot).toEqual([
+				chall_quiero,
+				chall_noquiero,
+			]);
+
+			var gameEnvidoReal = gameEnvido.next({'Foot': chall_realenvido});
+			expect(gameEnvidoReal.activePlayer()).toBe('Hand');
+			expect(gameEnvidoReal.result()).toBeFalsy();
+			expect(gameEnvidoReal.moves().Hand).toEqual([
+				chall_quiero,
+				chall_noquiero,
+				chall_faltaenvido
+			]);
+
+			var gameEnvidoRealFalta = gameEnvidoReal.next({'Hand': chall_faltaenvido});
+			expect(gameEnvidoRealFalta.activePlayer()).toBe('Foot');
+			expect(gameEnvidoRealFalta.result()).toBeFalsy();
+			expect(gameEnvidoRealFalta.moves().Foot).toEqual([
+				chall_quiero,
+				chall_noquiero,
+			]);
+
+			var gameEnvidoFalta = gameEnvido.next({'Foot': chall_faltaenvido});
+			expect(gameEnvidoFalta.activePlayer()).toBe('Hand');
+			expect(gameEnvidoFalta.result()).toBeFalsy();
+			expect(gameEnvidoFalta.moves().Hand).toEqual([
+				chall_quiero,
+				chall_noquiero,
+			]);
+
+			var gameReal = game.next({'Hand': chall_realenvido});
+			expect(gameReal.activePlayer()).toBe('Foot');
+			expect(gameReal.result()).toBeFalsy();
+			expect(gameReal.moves().Foot).toEqual([
+				chall_quiero,
+				chall_noquiero,
+				chall_faltaenvido
+			]);
+
+			var gameRealFalta = gameReal.next({'Foot': chall_faltaenvido});
+			expect(gameRealFalta.activePlayer()).toBe('Hand');
+			expect(gameRealFalta.result()).toBeFalsy();
+			expect(gameRealFalta.moves().Hand).toEqual([
+				chall_quiero,
+				chall_noquiero,
+			]);
+
+			var gameFalta = game.next({'Hand': chall_faltaenvido});
+			expect(gameFalta.activePlayer()).toBe('Foot');
+			expect(gameFalta.result()).toBeFalsy();
+			expect(gameFalta.moves().Foot).toEqual([
+				chall_quiero,
+				chall_noquiero,
+			]);
+
+			game = game.next({'Hand': 0});
+			// TODO: Continuar posibles combinaciones 0 -> ...
 		});
 	});
 
