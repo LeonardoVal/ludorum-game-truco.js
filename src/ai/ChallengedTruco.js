@@ -31,6 +31,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		this.trucoState = null;
 		this.trucoPosed = null;
 		this.canUpChallenge = null; // A player that can up the challenge later
+		this.sangTruco = {'Hand': false, 'Foot': false};
 
 		// The player that raised the first challenge in the current chain
 		// Necessary to give the turn to the correct player after a chain of upped challenges
@@ -53,6 +54,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		gclone.trucoState = this.trucoState;
 		gclone.trucoPosed = this.trucoPosed;
 		gclone.canUpChallenge = this.canUpChallenge;
+		gclone.sangTruco = {'Hand': this.sangTruco.Hand, 'Foot': this.sangTruco.Foot};
 
 		gclone.trucoChallenger = this.trucoChallenger;
 
@@ -75,6 +77,9 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		}
 
 		var moves = SubTruco.prototype.moves.call(this) || {'Hand': [], 'Foot': []};
+		var hasAllCards = (this.activePlayer() === 'Hand' ? this.cardsHand : this.cardsFoot).length === 3;
+		var sangTruco = this.sangTruco[this.activePlayer()];
+		var canEnvido = hasAllCards && !sangTruco;
 
 		if (this.envidoGoing) {
 			moves[this.activePlayer()] = [
@@ -89,7 +94,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				ChallengedTruco.CHALLENGES.Quiero,
 				ChallengedTruco.CHALLENGES.NoQuiero
 			];
-			if (this.table.length < 2) {
+			if (canEnvido) {
 				// The game is still on its firts round, and _Envido_ challenges can be raised
 				Array.prototype.push.apply(moves[this.activePlayer()], this.envidoResponses());
 			}
@@ -97,7 +102,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 			Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses(this.trucoPosed));
 		} else {
 			// No challenges are in negotiation. Can raise new ones or play normally
-			if (this.table.length < 2) {
+			if (canEnvido) {
 				// The game is still on its firts round, and _Envido_ challenges can be raised
 				Array.prototype.push.apply(moves[this.activePlayer()], this.envidoResponses());
 			}
@@ -157,6 +162,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 						that.trucoPosed = null;
 						that.canUpChallenge = (this.trucoPosed !== ChallengedTruco.CHALLENGES.ValeCuatro) ? activePlayer : null;
 						nextPlayer = this.trucoChallenger;
+						that.sangTruco[activePlayer] = true;
 						that.trucoChallenger = null;
 					} else { /* IMPOSSIBLE */ }
 					break;
@@ -176,6 +182,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				case ChallengedTruco.CHALLENGES.Truco:
 				case ChallengedTruco.CHALLENGES.ReTruco:
 				case ChallengedTruco.CHALLENGES.ValeCuatro:
+					that.sangTruco[activePlayer] = true;
 					if (!this.trucoChallenger) {
 						that.trucoChallenger = activePlayer;
 					}
