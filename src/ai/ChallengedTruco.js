@@ -89,6 +89,10 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				ChallengedTruco.CHALLENGES.Quiero,
 				ChallengedTruco.CHALLENGES.NoQuiero
 			];
+			if (this.table.length < 2) {
+				// The game is still on its firts round, and _Envido_ challenges can be raised
+				Array.prototype.push.apply(moves[this.activePlayer()], this.envidoResponses());
+			}
 			// Additionally the player can up the challenge by betting more points
 			Array.prototype.push.apply(moves[this.activePlayer()], this.trucoResponses(this.trucoPosed));
 		} else {

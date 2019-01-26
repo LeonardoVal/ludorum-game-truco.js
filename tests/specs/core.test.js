@@ -257,6 +257,9 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			expect(game.moves().Foot).toEqual([
 				chall_quiero, 
 				chall_noquiero, 
+				chall_faltaenvido,
+				chall_realenvido,
+				chall_envido,
 				chall_retruco,
 			]);
 
@@ -301,7 +304,13 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			gameRetruco = game.next({'Foot': chall_retruco}); 
 			expect(gameRetruco.activePlayer()).toBe('Hand');
 			expect(gameRetruco.result()).toBeFalsy();
-			expect(gameRetruco.moves().Hand).toEqual([chall_quiero, chall_noquiero, chall_valecuatro]);
+			expect(gameRetruco.moves().Hand).toEqual([
+				chall_quiero,
+				chall_noquiero,
+				chall_faltaenvido,
+				chall_realenvido,
+				chall_envido,
+				chall_valecuatro]);
 
 			gameRetruco = gameRetruco.next({'Hand': chall_quiero});
 			expect(gameRetruco.activePlayer()).toBe('Hand'); 
