@@ -81,6 +81,52 @@ var SubTruco = exports.ai.SubTruco = declare(Game, {
 		this.realTable = this.table.map(p);
 		this.realHand = this.cardsHand.map(p);
 		this.realFoot = this.cardsFoot.map(p);
+
+		var m = {};
+
+		var q = (n) => {
+			// SUITS ♦ ♥ ♠ ♣
+			var ix;
+			switch (n) {
+				case 1:  // 4♦ 4♥ 4♠ 4♣: 12...
+				case 2:  // 5♦ 5♥ 5♠ 5♣: 16...
+				case 3:  // 6♦ 6♥ 6♠ 6♣: 20...
+				case 5:  // A♦ A♥ A♠ A♣: 28...
+				case 6:  // B♦ B♥ B♠ B♣: 32...
+				case 7:  // C♦ C♥ C♠ C♣: 36...
+					ix = 4 * (n+2);
+					break;
+				case 4:  // 7♥ 7♣      : 25, 27
+					if (m[25]) {
+						return 27;
+					}
+					m[25] = true;
+					return 25;
+				case 8:  // 1♦ 1♥      : 0...
+				case 9:  // 2♦ 2♥ 2♠ 2♣: 4...
+				case 10: // 3♦ 3♥ 3♠ 3♣: 8...
+					ix = 4 * (n-8);
+					break;
+				case 11: // 7♦         : 24
+					return 24;
+				case 12: // 7♠         : 26
+					return 26;
+				case 13: // 1♣         : 3
+					return 3;
+				case 14: // 1♠         : 2
+					return 2;
+				default:
+					return 0;
+
+			}
+			while (m[ix]) {
+				ix = ix+1;
+			}
+			m[ix] = true;
+			return ix;
+		};
+		this.cardsEnvidoHand = this.cardsHand.map(q);
+		this.cardsEnvidoFoot = this.cardsFoot.map(q);
 	},
 
 	/** The round may end when both players have played two cards, if one player wins both card

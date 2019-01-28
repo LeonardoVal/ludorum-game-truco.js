@@ -42,11 +42,11 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	},
 
 	__calcularEnvido__ : function __calcularEnvido__() {
-		if (this.realHand.length == 3) {
-			this._envidoHand = envidoTotal(this.realHand);
+		if (this.cardsEnvidoHand .length == 3) {
+			this._envidoHand = envidoTotal(this.cardsEnvidoHand );
 		}
-		if (this.realFoot.length == 3) {
-			this._envidoFoot = envidoTotal(this.realFoot);
+		if (this.cardsEnvidoFoot.length == 3) {
+			this._envidoFoot = envidoTotal(this.cardsEnvidoFoot);
 		}
 
 	},
