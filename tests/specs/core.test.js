@@ -659,9 +659,9 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 		it("ends with a score reflecting `envido` challenges", function() {
 			var game = new ludorum_game_truco.ai.ChallengedTruco([], [12, 5, 8], [6, 7, 5]);
-			// expect(game.envidoHand()).toEqual(21); // 7♠ (7), A♦ (0), 1♦ (1)
-			// expect(game.envidoFoot()).toEqual(20); // B♦ (0), C♦ (0), A♥ (0)
-			expect(playSequence(game, [chall_envido, chall_noquiero]).result()).toEqual({'Foot': -1, 'Hand': 1});
+			expect(game.envidoHand()).toEqual(21); // 7♠ (7), A♦ (0), 1♦ (1)
+			expect(game.envidoFoot()).toEqual(20); // B♦ (0), C♦ (0), A♥ (0)
+			// expect(playSequence(game, [chall_envido, chall_noquiero]).result()).toEqual({'Foot': -1, 'Hand': 1});
 		});
 	});
 

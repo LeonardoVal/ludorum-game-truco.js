@@ -26,6 +26,9 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		 // _Envido_ related
 		this.envidoStack = [];
 		this.envidoGoing = false; // TODO: Update envidoGoing when a challenge is raised/answered
+		this._envidoHand = 0;
+		this._envidoFoot = 0;
+		this.__calcularEnvido__();
 
 		// _Truco_ related
 		this.trucoState = null;
@@ -36,6 +39,16 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		// The player that raised the first challenge in the current chain
 		// Necessary to give the turn to the correct player after a chain of upped challenges
 		this.trucoChallenger = null;
+	},
+
+	__calcularEnvido__ : function __calcularEnvido__() {
+		if (this.realHand.length == 3) {
+			this._envidoHand = envidoTotal(this.realHand);
+		}
+		if (this.realFoot.length == 3) {
+			this._envidoFoot = envidoTotal(this.realFoot);
+		}
+
 	},
 
 	/** Clones the game to create apparently inmutable progression **/
@@ -50,6 +63,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 		gclone.envidoStack = this.envidoStack.slice();
 		gclone.envidoGoing = this.envidoGoing;
+		gclone._envidoHand = this._envidoHand;
+		gclone._envidoFoot = this._envidoFoot;
 
 		gclone.trucoState = this.trucoState;
 		gclone.trucoPosed = this.trucoPosed;
@@ -206,6 +221,14 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	},
 
 	// ## Utility methods ##########################################################################
+
+	envidoHand: function envidoHand() {
+		return this._envidoHand;
+	},
+
+	envidoFoot: function envidoFoot() {
+		return this._envidoFoot;
+	},
 
 	/** Calculates the value of the game based on the trucoStack **/
 	trucoStackWorth: function trucoStackWorth() {
