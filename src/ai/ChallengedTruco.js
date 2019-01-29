@@ -28,6 +28,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		this.envidoGoing = false; // TODO: Update envidoGoing when a challenge is raised/answered
 		this._envidoHand = 0;
 		this._envidoFoot = 0;
+		this.envidoWinner = null;
 		this.__calcularEnvido__();
 
 		// _Truco_ related
@@ -65,6 +66,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		gclone.envidoGoing = this.envidoGoing;
 		gclone._envidoHand = this._envidoHand;
 		gclone._envidoFoot = this._envidoFoot;
+		gclone.envidoWinner = this.envidoWinner;
 
 		gclone.trucoState = this.trucoState;
 		gclone.trucoPosed = this.trucoPosed;
@@ -138,12 +140,17 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		if (sub) {
 			r[this.players[0]] = sub[this.players[0]] * this.trucoStackWorth();
 			r[this.players[1]] = sub[this.players[1]] * this.trucoStackWorth();
-			return r;
 		} else if (this.trucoWinner) {
 			r[this.trucoWinner] = this.trucoStackWorth();
 			r[this.trucoWinner === 'Hand' ? 'Foot' : 'Hand'] = -r[this.trucoWinner];
-			return r;
+		} else {
+			return null;
 		}
+		if (this.envidoWinner) {
+			r[this.envidoWinner] += this.envidoStackWorth();
+			r[this.envidoWinner === 'Hand' ? 'Foot' : 'Hand'] += -this.envidoStackWorth();
+		}
+		return r;
 	},
 
 	/**
@@ -165,13 +172,12 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 			switch (move) {
 				case ChallengedTruco.CHALLENGES.Quiero:
 					if (envidoChallenge) {
-						var handEnvido = envidoTotal(that.cardsHand);
-						var footEnvido = envidoTotal(that.cardsFoot);
-						var envidoWinner = handEnvido >= footEnvido ? 'Hand' : 'Foot';
-						var envidoWinPoints = that.envidoStackWorth()[0];
+						var handEnvido = this._envidoHand;
+						var footEnvido = this._envidoFoot;
 						that.envidoGoing = false;
-						// TODO: (meeting) How are the different ENVIDO scores published
-						// in Game.result()?
+						that.envidoWinner = handEnvido >= footEnvido ? 'Hand' : 'Foot';
+						that.envidoStack.push(move);
+						nextPlayer = this.cardsHand.length === 3 ? 'Hand' : 'Foot';
 					} else if (this.trucoPosed) {
 						that.trucoState = that.trucoPosed;
 						that.trucoPosed = null;
@@ -185,8 +191,9 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				case ChallengedTruco.CHALLENGES.NoQuiero:
 					if (envidoChallenge) {
 						that.envidoGoing = false;
-						var envidoNotWantedPoints = that.envidoStackWorth()[1];
-						// TODO: Assign score to the challenging player, game continues
+						that.envidoWinner = nextPlayer;
+						that.envidoStack.push(move);
+						nextPlayer = this.cardsHand.length === 3 ? 'Hand' : 'Foot';
 					} else if (this.trucoPosed) {
 						that.trucoPosed = null;
 						var op = this.opponent();
@@ -238,7 +245,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		// TRUCO; ReTruco, ValeCuatro: 4
 	},
 
-	getEnvidoChallenge: function() {
+	getEnvidoChallenge: function getEnvidoChallenge() {
 		return this.envidoStack[this.envidoStack.length - 1];
 	},
 
@@ -261,10 +268,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	 * E, RE, FE       x/5
 	 */
 	envidoStackWorth: function envidoStackWorth() {
-		if (this.envidoStack.length) {
-			return null;
-		}
-		var wanted = 1;
+		var wanted = 0;
 		var notWanted = 0;
 		for (var i = 0; i < this.envidoStack.length; i++) {
 			notWanted = wanted;
@@ -278,6 +282,10 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					break;
 				case ChallengedTruco.CHALLENGES.FaltaEnvido:
 					return [this.faltaEnvidoScore(), notWanted];
+				case ChallengedTruco.CHALLENGES.Quiero:
+					return wanted;
+				case ChallengedTruco.CHALLENGES.NoQuiero:
+					return notWanted;
 			}
 		}
 		return [wanted, notWanted];

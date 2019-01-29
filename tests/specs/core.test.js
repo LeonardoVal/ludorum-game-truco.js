@@ -661,7 +661,23 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 			var game = new ludorum_game_truco.ai.ChallengedTruco([], [12, 5, 8], [6, 7, 5]);
 			expect(game.envidoHand()).toEqual(21); // 7♠ (7), A♦ (0), 1♦ (1)
 			expect(game.envidoFoot()).toEqual(20); // B♦ (0), C♦ (0), A♥ (0)
-			// expect(playSequence(game, [chall_envido, chall_noquiero]).result()).toEqual({'Foot': -1, 'Hand': 1});
+
+			function envidoEndScore(game, envidoScoreHand) {
+				winnerWithScore(game, 1 + envidoScoreHand);
+			}
+
+			winnerWithScore(game, 1);
+			envidoEndScore(playSequence(game, [chall_envido, chall_quiero]), 2);
+			envidoEndScore(playSequence(game, [chall_realenvido, chall_quiero]), 3);
+			// envidoEndScore(playSequence(game, [chall_faltaenvido, chall_quiero]), );
+			envidoEndScore(playSequence(game, [chall_envido, chall_envido, chall_quiero]), 4);
+			envidoEndScore(playSequence(game, [chall_envido, chall_realenvido, chall_quiero]), 5);
+			envidoEndScore(playSequence(game, [chall_envido, chall_envido, chall_realenvido, chall_quiero]), 7);
+			// envidoEndScore(playSequence(game, [chall_envido, chall_envido, chall_realenvido, chall_faltaenvido, chall_quiero]), );
+			// envidoEndScore(playSequence(game, [chall_envido, chall_faltaenvido, chall_quiero]), );
+			// envidoEndScore(playSequence(game, [chall_realenvido, chall_faltaenvido, chall_quiero]), );
+			// envidoEndScore(playSequence(game, [chall_envido, chall_envido, chall_faltaenvido, chall_quiero]), );
+			// envidoEndScore(playSequence(game, [chall_envido, chall_realenvido, chall_faltaenvido, chall_quiero]), 2);
 		});
 	});
 
