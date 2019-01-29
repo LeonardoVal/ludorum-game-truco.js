@@ -43,7 +43,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	},
 
 	__calcularEnvido__ : function __calcularEnvido__() {
-		if (this.cardsEnvidoHand .length == 3) {
+		if (this.cardsEnvidoHand.length == 3) {
 			this._envidoHand = envidoTotal(this.cardsEnvidoHand );
 		}
 		if (this.cardsEnvidoFoot.length == 3) {
@@ -148,7 +148,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 		}
 		if (this.envidoWinner) {
 			r[this.envidoWinner] += this.envidoStackWorth();
-			r[this.envidoWinner === 'Hand' ? 'Foot' : 'Hand'] += -this.envidoStackWorth();
+			r[this.envidoWinner === 'Hand' ? 'Foot' : 'Hand'] -= this.envidoStackWorth();
 		}
 		return r;
 	},
@@ -191,7 +191,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 				case ChallengedTruco.CHALLENGES.NoQuiero:
 					if (envidoChallenge) {
 						that.envidoGoing = false;
-						that.envidoWinner = nextPlayer;
+						that.envidoWinner = this.opponent();
 						that.envidoStack.push(move);
 						nextPlayer = this.cardsHand.length === 3 ? 'Hand' : 'Foot';
 					} else if (this.trucoPosed) {
@@ -269,11 +269,23 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	 */
 	envidoStackWorth: function envidoStackWorth() {
 		var wanted = 0;
-		var notWanted = 0;
-		for (var i = 0; i < this.envidoStack.length; i++) {
-			notWanted = wanted;
+		var notWanted = 1;
+		if (this.envidoStack.length > 0) {
+			switch (this.envidoStack[0]) {
+				case ChallengedTruco.CHALLENGES.Envido:
+					wanted = 2;
+					break;
+				case ChallengedTruco.CHALLENGES.RealEnvido:
+					wanted = 3;
+					break;
+				case ChallengedTruco.CHALLENGES.FaltaEnvido:
+					return [this.faltaEnvidoScore(), wanted];
+			}
+		}
+		for (var i = 1; i < this.envidoStack.length; i++) {
 			switch (this.envidoStack[i]) {
 				case ChallengedTruco.CHALLENGES.Envido:
+					notWanted = wanted;
 					wanted += 2;
 					break;
 				case ChallengedTruco.CHALLENGES.RealEnvido:
@@ -281,7 +293,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					wanted += 3;
 					break;
 				case ChallengedTruco.CHALLENGES.FaltaEnvido:
-					return [this.faltaEnvidoScore(), notWanted];
+					return [this.faltaEnvidoScore(), wanted];
 				case ChallengedTruco.CHALLENGES.Quiero:
 					return wanted;
 				case ChallengedTruco.CHALLENGES.NoQuiero:

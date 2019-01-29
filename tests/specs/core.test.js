@@ -668,11 +668,21 @@ function (base, Sermat, ludorum, ludorum_game_truco) {
 
 			winnerWithScore(game, 1);
 			envidoEndScore(playSequence(game, [chall_envido, chall_quiero]), 2);
+			envidoEndScore(playSequence(game, [chall_envido, chall_noquiero]), 1);
+
 			envidoEndScore(playSequence(game, [chall_realenvido, chall_quiero]), 3);
+			envidoEndScore(playSequence(game, [chall_realenvido, chall_noquiero]), 1);
+
 			// envidoEndScore(playSequence(game, [chall_faltaenvido, chall_quiero]), );
 			envidoEndScore(playSequence(game, [chall_envido, chall_envido, chall_quiero]), 4);
+			envidoEndScore(playSequence(game, [chall_envido, chall_envido, chall_noquiero]), -2);
+
 			envidoEndScore(playSequence(game, [chall_envido, chall_realenvido, chall_quiero]), 5);
+			envidoEndScore(playSequence(game, [chall_envido, chall_realenvido, chall_noquiero]), -2);
+
 			envidoEndScore(playSequence(game, [chall_envido, chall_envido, chall_realenvido, chall_quiero]), 7);
+			envidoEndScore(playSequence(game, [chall_envido, chall_envido, chall_realenvido, chall_noquiero]), 4);
+
 			// envidoEndScore(playSequence(game, [chall_envido, chall_envido, chall_realenvido, chall_faltaenvido, chall_quiero]), );
 			// envidoEndScore(playSequence(game, [chall_envido, chall_faltaenvido, chall_quiero]), );
 			// envidoEndScore(playSequence(game, [chall_realenvido, chall_faltaenvido, chall_quiero]), );
