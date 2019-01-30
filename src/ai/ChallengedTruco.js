@@ -279,7 +279,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					wanted = 3;
 					break;
 				case ChallengedTruco.CHALLENGES.FaltaEnvido:
-					return [this.faltaEnvidoScore(), wanted];
+					wanted = this.faltaEnvidoScore();
+					break;
 			}
 		}
 		for (var i = 1; i < this.envidoStack.length; i++) {
@@ -293,7 +294,9 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					wanted += 3;
 					break;
 				case ChallengedTruco.CHALLENGES.FaltaEnvido:
-					return [this.faltaEnvidoScore(), wanted];
+					wanted = this.faltaEnvidoScore();
+					notWanted = wanted;
+					break;
 				case ChallengedTruco.CHALLENGES.Quiero:
 					return wanted;
 				case ChallengedTruco.CHALLENGES.NoQuiero:
@@ -346,17 +349,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 	 * necessary for the winning player to win the global game.
 	 */
 	faltaEnvidoScore: function faltaEnvidoScore() {
-		var handGlobal = this.globalScore.Hand;
-		var footGlobal = this.globalScore.Foot;
-		if (handGlobal <= 15 && footGlobal <= 15) {
-			if (this.activePlayer() === 'Hand') {
-				return 30 - handGlobal;
-			} else {
-				return 30 - footGlobal;
-			}
-		} else {
-			return 30 - Math.max(handGlobal, footGlobal);
-		}
+		return 8;
 	},
 
 	'static CHALLENGES': {
