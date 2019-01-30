@@ -25,7 +25,7 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 
 		 // _Envido_ related
 		this.envidoStack = [];
-		this.envidoGoing = false; // TODO: Update envidoGoing when a challenge is raised/answered
+		this.envidoGoing = false;
 		this._envidoHand = 0;
 		this._envidoFoot = 0;
 		this.envidoWinner = null;
