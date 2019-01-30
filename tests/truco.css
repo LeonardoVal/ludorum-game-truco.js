@@ -107,6 +107,10 @@ footer {
 	font-weight: bold;
 }
 
+#board .envido {
+	font-size: 1.5em !important;
+}
+
 #board .state {
 	background-color: #53ffed;
 	font-size: 2em;

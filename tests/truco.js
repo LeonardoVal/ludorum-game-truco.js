@@ -23,6 +23,7 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 			'challenge': 'activeCard challenge',
 			'nochall': 'challenge',
 			'state': 'state challenge',
+			'envidoState': 'envido state challenge',
 		},
 
 		uiRow: {
@@ -118,6 +119,10 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 								data.innerHTML = '<span class="tag">Posed:</span><br/>' + moveToState(game.trucoPosed);
 								data.className = classNames.state;
 								break;
+							case 0:
+								data.innerHTML = showEnvidoStack(game.envidoStack);
+								data.className = classNames.envidoState;
+								break;
 						}
 					}
 				});
@@ -135,6 +140,25 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 			default:
 				return '&nbsp;';
 		}
+	}
+
+	function showEnvidoStack(stack) {
+		var s = "";
+		for (var i = 0; i < stack.length; i++) {
+			var m = stack[i];
+			switch (m) {
+				case CHALLENGES.Envido:
+					s += 'En ';
+					break;
+				case CHALLENGES.RealEnvido:
+					s += 'RE ';
+					break;
+				case CHALLENGES.FaltaEnvido:
+					s += 'FE ';
+					break;
+			}
+		}
+		return s;
 	}
 
 
