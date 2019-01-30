@@ -294,8 +294,8 @@ var ChallengedTruco = exports.ai.ChallengedTruco = declare(SubTruco, {
 					wanted += 3;
 					break;
 				case ChallengedTruco.CHALLENGES.FaltaEnvido:
-					wanted = this.faltaEnvidoScore();
 					notWanted = wanted;
+					wanted = this.faltaEnvidoScore();
 					break;
 				case ChallengedTruco.CHALLENGES.Quiero:
 					return wanted;
