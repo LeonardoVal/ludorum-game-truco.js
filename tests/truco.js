@@ -46,19 +46,19 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 			console.log(moves);
 			console.log(CHALLENGES);
 
-		function challMove(row, column, data, moveList, move, symbol) {
-			if (data.coord[0] !== row || data.coord[1] !== column) {
-				return;
+			function challMove(row, column, data, moveList, move, symbol) {
+				if (data.coord[0] !== row || data.coord[1] !== column) {
+					return;
+				}
+				data.innerHTML = symbol;
+				data.className = classNames.nochall;
+				if (moveList.includes(move)) {
+					data.className = classNames.challenge;
+					data.move = move;
+					data.activePlayer = activePlayer;
+					data.onclick = ui.perform.bind(ui, data.move, activePlayer);
+				}
 			}
-			data.innerHTML = symbol;
-			data.className = classNames.nochall;
-			if (moveList.includes(move)) {
-				data.className = classNames.challenge;
-				data.move = move;
-				data.activePlayer = activePlayer;
-				data.onclick = ui.perform.bind(ui, data.move, activePlayer);
-			}
-		}
 
 			moves = moves && moves[activePlayer] && moves[activePlayer].length > 0;
 			(new CheckerboardFromString(4, 6))
@@ -104,15 +104,18 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 						challMove(2, 3, data, moveList, CHALLENGES.Truco, 'Tr');
 						challMove(2, 4, data, moveList, CHALLENGES.ReTruco, 'RT');
 						challMove(1, 3, data, moveList, CHALLENGES.ValeCuatro, 'V4');
+						challMove(1, 4, data, moveList, CHALLENGES.Envido, 'En');
+						challMove(0, 3, data, moveList, CHALLENGES.RealEnvido, 'RE');
+						challMove(0, 4, data, moveList, CHALLENGES.FaltaEnvido, 'FE');
 					} else {
 						data.innerHTML = '&nbsp;';
 						switch (data.coord[0]) {
 							case 3:
-								data.innerHTML = '<span class="tag">State:</span><br/>' + trucoToState(game.trucoState);
+								data.innerHTML = '<span class="tag">State:</span><br/>' + moveToState(game.trucoState);
 								data.className = classNames.state;
 								break;
 							case 2:
-								data.innerHTML = '<span class="tag">Posed:</span><br/>' + trucoToState(game.trucoPosed);
+								data.innerHTML = '<span class="tag">Posed:</span><br/>' + moveToState(game.trucoPosed);
 								data.className = classNames.state;
 								break;
 						}
@@ -121,7 +124,7 @@ init(['ludorum', 'creatartis-base', 'sermat', 'playtester', 'ludorum-game-truco'
 		}
 	});
 
-	function trucoToState(challenge) {
+	function moveToState(challenge) {
 		switch (challenge) {
 			case CHALLENGES.Truco:
 				return 'Tr';
